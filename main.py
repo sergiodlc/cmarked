@@ -43,6 +43,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 from PySide import QtCore, QtGui
 from ui.main_window import Ui_MainWindow
+import os
 
 __version__ = "0.1.0"
 
@@ -56,12 +57,36 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         super(CMarkEdMainWindow, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.connectSlots()
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
+
+    def connectSlots(self):
+        QtCore.QObject.connect(self.ui.action_Open, QtCore.SIGNAL("triggered(bool)"), self.setOpenFileName)
+        QtCore.QObject.connect(self.ui.action_Save, QtCore.SIGNAL("triggered(bool)"), self.saveFile)
 
     def sourceTextChanged(self):
         rendered = md2html(self.ui.sourceText.toPlainText())
         self.ui.previewText.setHtml(rendered)
-        print(rendered)
+    
+    def saveFile(self):
+         fileName, filtr = QtGui.QFileDialog.getSaveFileName(self)
+         if fileName:
+            with open(fileName, 'w', encoding='utf-8') as outf:
+                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                outf.write(self.ui.sourceText.toPlainText())
+                QtGui.QApplication.restoreOverrideCursor()
+
+    def setOpenFileName(self):    
+        fileName, _ = QtGui.QFileDialog.getOpenFileName(self,
+                "Open CommonMark File",
+                "", "Text Files (*.txt *.md *.markdown .*)")
+        if fileName:
+            with open(fileName, 'r', encoding='UTF-8') as f:
+                inf = f.read()
+                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                os.chdir(os.path.dirname(fileName))
+                self.ui.sourceText.setPlainText(inf)
+                QtGui.QApplication.restoreOverrideCursor()
 
 
 if __name__ == "__main__":
