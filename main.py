@@ -56,6 +56,12 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
         self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
+
+        # Set up the status bar:
+        self.status_template = self.tr('Chars: {0}, Ln: {1}')
+        self.statusLabel = QtGui.QLabel(self.status_template.format(0, 0))
+        self.ui.statusbar.addPermanentWidget(self.statusLabel)
+
         self.connectSlots()
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
 
@@ -66,6 +72,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
+        self.ui.previewText.textChanged.connect(self.updateStatusBar)
 
     def onSourceScrollChanged(self):
         if self.vPreviewScrollBar and self.vSourceScrollBar:
@@ -100,6 +107,9 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 self.ui.sourceText.setPlainText(inf)
                 QtGui.QApplication.restoreOverrideCursor()
 
+    def updateStatusBar(self):
+        doc = self.ui.previewText.document()
+        self.statusLabel.setText(self.status_template.format(doc.characterCount(), doc.lineCount()))
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
