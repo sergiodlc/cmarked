@@ -41,6 +41,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 from PySide import QtCore, QtGui
 from ui.main_window import Ui_MainWindow
+from contextlib import contextmanager
 import os
 
 __version__ = "0.1.0"
@@ -53,6 +54,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         super(CMarkEdMainWindow, self).__init__(parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.action_Save.setDisabled(True)
 
         self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
         self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
@@ -63,12 +65,18 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui.statusbar.addPermanentWidget(self.statusLabel)
 
         self.connectSlots()
+        self.appTitle = "CMarked"
+        self.workingFile  = ""
+        self.workingDirectory = ""
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
 
     def connectSlots(self):
-        QtCore.QObject.connect(self.ui.action_Open, QtCore.SIGNAL("triggered(bool)"), self.setOpenFileName)
-        QtCore.QObject.connect(self.ui.action_Save, QtCore.SIGNAL("triggered(bool)"), self.saveFile)
-
+        self.ui.action_Open.triggered.connect(self.onOpenFile)
+        self.ui.action_Save.triggered.connect(self.onSaveFile)
+        self.ui.action_Save_As.triggered.connect(self.onSaveAs)
+        self.ui.action_Export.triggered.connect(self.onExport)
+        self.ui.sourceText.document().contentsChanged.connect(self.onDocumentWasModified)
+        self.ui.action_Quit.triggered.connect(self.close)
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
@@ -87,32 +95,132 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         if preview_pos is not None:
             self.vPreviewScrollBar.setValue(preview_pos)
 
-    def saveFile(self):
-         fileName, filtr = QtGui.QFileDialog.getSaveFileName(self)
-         if fileName:
-            with open(fileName, 'w', encoding='utf-8') as outf:
-                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                outf.write(self.ui.sourceText.toPlainText())
-                QtGui.QApplication.restoreOverrideCursor()
+    def onDocumentWasModified(self):
+        self.setWindowModified(self.ui.sourceText.document().isModified())
+        if self.isWindowModified:
+            self.ui.action_Save.setDisabled(False)
+    
+    def onSaveFile(self):
+        if self.workingFile:
+            with self._opened_w_error(self.workingFile, 'w') as (f, err):
+                if err:
+                    QtGui.QMessageBox.warning(self, "Application",
+                                             "Cannot open file: {}.".format(f))
+                else:
+                    QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                    f.write(self.ui.sourceText.toPlainText())
+                    self.setWindowModified(False)
+                    self.ui.action_Save.setDisabled(True)
+                    QtGui.QApplication.restoreOverrideCursor()
+        else:
+            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, "Save CommonMark File",
+                "new_common_mark", "MarkDown files (*.md *.markdown);; All files(*.*)")
+            if fileName:
+                with self._opened_w_error(fileName, 'w') as (f, err):
+                    if err:
+                        QtGui.QMessageBox.warning(self, "Application",
+                        "Cannot open file: {}.".format(f))
+                    else:
+                        QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                        self.workingFile = fileName
+                        workindDirectory = os.path.dirname(fileName)
+                        os.chdir(workindDirectory)
+                        self.workingDirectory = workindDirectory
+                        f.write(self.ui.sourceText.toPlainText())
+                        self.setWindowTitle(self.appTitle + " - {}[*]".format(fileName))
+                        self.setWindowModified(False);
+                        self.ui.action_Save.setDisabled(True)
+                        QtGui.QApplication.restoreOverrideCursor()
 
-    def setOpenFileName(self):
+    def onSaveAs(self):
+        if not self.workingFile :
+            self.onSaveFile()
+        else:
+            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, "Save As CommonMark File",
+            "", "MarkDown files (*.md *.markdown);; All files(*.*)")
+            if fileName:
+                with self._opened_w_error(fileName, 'w') as (f, err):
+                    if err:
+                        QtGui.QMessageBox.warning(self, "Application",
+                        "Cannot open file: {}.".format(f))
+                    else:
+                        QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                        f.write(self.ui.sourceText.toPlainText())
+                        if self.isWindowModified():
+                            self.onSaveFile()
+                        QtGui.QApplication.restoreOverrideCursor()
+
+    def onOpenFile(self):    
         fileName, _ = QtGui.QFileDialog.getOpenFileName(self,
                 "Open CommonMark File",
-                "", "Text Files (*.txt *.md *.markdown .*)")
+                "", "MarkDown files (*.md *.markdown);; All files(*.*)")
         if fileName:
             with open(fileName, 'r', encoding='UTF-8') as f:
                 inf = f.read()
                 QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                os.chdir(os.path.dirname(fileName))
+                workingDirectory = os.path.dirname(fileName)
+                os.chdir(workingDirectory)
                 self.ui.sourceText.setPlainText(inf)
+                self.workingFile = fileName
+                self.workingDirectory = workingDirectory
+                self.setWindowTitle(self.appTitle + " - {}[*]".format(fileName))
+                self.setWindowModified(False)
                 QtGui.QApplication.restoreOverrideCursor()
+
+    def onExport(self):
+        fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, "Export CommonMark File",
+                "", "HTML files (*.html)")
+        if fileName:
+            with self._opened_w_error(fileName, 'w') as (f, err):
+                if err:
+                        QtGui.QMessageBox.warning(self, "Application",
+                        "Cannot open file: {}.".format(f))
+                else:
+                    QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                    f.write(self.ui.previewText.toHtml())
+                    QtGui.QApplication.restoreOverrideCursor()
+
+    def closeEvent(self, event):
+        if self.isWindowModified():
+            msgBox = QtGui.QMessageBox()
+            msgBox.setWindowTitle("Confirmation Message")
+            msgBox.setText("The document has been modified.")
+            msgBox.setInformativeText("Do you want to save your changes?")
+            msgBox.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
+            msgBox.setDefaultButton(QtGui.QMessageBox.Save)
+            ret = msgBox.exec_()
+            if ret == QtGui.QMessageBox.Save:
+                self.onSaveFile()
+                event.accept()   
+            elif ret == QtGui.QMessageBox.Discard:
+                event.accept()
+            elif ret == QtGui.QMessageBox.Cancel:
+                event.ignore()
+                msgBox.close()
+        else:
+            event.accept()
+
+    @staticmethod
+    @contextmanager
+    def _opened_w_error(filename, mode, encoding="UTF-8"):
+        try:
+            f = open(filename, mode, encoding= encoding)
+        except IOError as err:
+            yield None, err
+        else:
+            try:
+                yield f, None
+            finally:
+                f.close()
 
     def updateStatusBar(self):
         doc = self.ui.previewText.document()
         self.statusLabel.setText(self.status_template.format(doc.characterCount(), doc.lineCount()))
 
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     myMainWindow = CMarkEdMainWindow()
+    myMainWindow.setWindowTitle(myMainWindow.appTitle + " - new_common_mark.md[*]")
     myMainWindow.show()
     sys.exit(app.exec_())
