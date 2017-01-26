@@ -66,7 +66,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         self.connectSlots()
         self.appTitle = "CMarked"
-        self.workingFile  = ""
+        self.workingFile = ""
         self.workingDirectory = ""
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
 
@@ -86,7 +86,10 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         if self.vPreviewScrollBar and self.vSourceScrollBar:
             smin, spos, smax = self.vSourceScrollBar.minimum(), self.vSourceScrollBar.value(), self.vSourceScrollBar.maximum()
             tmin, tmax = self.vPreviewScrollBar.minimum(), self.vPreviewScrollBar.maximum()
-            self.vPreviewScrollBar.setValue(((spos - smin) / (smax - smin)) * (tmax - tmin) + tmin)
+            try:
+                self.vPreviewScrollBar.setValue(((spos - smin) / (smax - smin)) * (tmax - tmin) + tmin)
+            except ZeroDivisionError:
+                pass
 
     def sourceTextChanged(self):
         preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
@@ -99,13 +102,13 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.setWindowModified(self.ui.sourceText.document().isModified())
         if self.isWindowModified:
             self.ui.action_Save.setDisabled(False)
-    
+
     def onSaveFile(self):
         if self.workingFile:
             with self._opened_w_error(self.workingFile, 'w') as (f, err):
                 if err:
-                    QtGui.QMessageBox.warning(self, "Application",
-                                             "Cannot open file: {}.".format(f))
+                    QtGui.QMessageBox.warning(self, self.tr("Application"),
+                            self.tr("Cannot open file: {}.").format(fileName))
                 else:
                     QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                     f.write(self.ui.sourceText.toPlainText())
@@ -113,13 +116,13 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                     self.ui.action_Save.setDisabled(True)
                     QtGui.QApplication.restoreOverrideCursor()
         else:
-            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, "Save CommonMark File",
-                "new_common_mark", "MarkDown files (*.md *.markdown);; All files(*.*)")
+            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Save File"),
+                "new_common_mark", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
             if fileName:
                 with self._opened_w_error(fileName, 'w') as (f, err):
                     if err:
-                        QtGui.QMessageBox.warning(self, "Application",
-                        "Cannot open file: {}.".format(f))
+                        QtGui.QMessageBox.warning(self, self.tr("Application"),
+                                self.tr("Cannot open file: {}.").format(fileName))
                     else:
                         QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                         self.workingFile = fileName
@@ -136,13 +139,13 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         if not self.workingFile :
             self.onSaveFile()
         else:
-            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, "Save As CommonMark File",
-            "", "MarkDown files (*.md *.markdown);; All files(*.*)")
+            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Save as"),
+                    "", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
             if fileName:
                 with self._opened_w_error(fileName, 'w') as (f, err):
                     if err:
-                        QtGui.QMessageBox.warning(self, "Application",
-                        "Cannot open file: {}.".format(f))
+                        QtGui.QMessageBox.warning(self, self.tr("Application"),
+                                self.tr("Cannot open file: {}.").format(fileName))
                     else:
                         QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                         f.write(self.ui.sourceText.toPlainText())
@@ -150,10 +153,10 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                             self.onSaveFile()
                         QtGui.QApplication.restoreOverrideCursor()
 
-    def onOpenFile(self):    
+    def onOpenFile(self):
         fileName, _ = QtGui.QFileDialog.getOpenFileName(self,
-                "Open CommonMark File",
-                "", "MarkDown files (*.md *.markdown);; All files(*.*)")
+                self.tr("Open File"),
+                "", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
         if fileName:
             with open(fileName, 'r', encoding='UTF-8') as f:
                 inf = f.read()
@@ -168,13 +171,13 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 QtGui.QApplication.restoreOverrideCursor()
 
     def onExport(self):
-        fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, "Export CommonMark File",
-                "", "HTML files (*.html)")
+        fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Export to"),
+                "", self.tr("HTML files (*.html)"))
         if fileName:
             with self._opened_w_error(fileName, 'w') as (f, err):
                 if err:
-                        QtGui.QMessageBox.warning(self, "Application",
-                        "Cannot open file: {}.".format(f))
+                    QtGui.QMessageBox.warning(self, self.tr("Application"),
+                            self.tr("Cannot open file: {}.").format(fileName))
                 else:
                     QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                     f.write(self.ui.previewText.toHtml())
@@ -182,16 +185,16 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
     def closeEvent(self, event):
         if self.isWindowModified():
-            msgBox = QtGui.QMessageBox()
-            msgBox.setWindowTitle("Confirmation Message")
-            msgBox.setText("The document has been modified.")
-            msgBox.setInformativeText("Do you want to save your changes?")
+            msgBox = QtGui.QMessageBox(self)
+            msgBox.setWindowTitle(self.tr("Confirmation Message"))
+            msgBox.setText(self.tr("The document has been modified."))
+            msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
             msgBox.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
             msgBox.setDefaultButton(QtGui.QMessageBox.Save)
             ret = msgBox.exec_()
             if ret == QtGui.QMessageBox.Save:
                 self.onSaveFile()
-                event.accept()   
+                event.accept()
             elif ret == QtGui.QMessageBox.Discard:
                 event.accept()
             elif ret == QtGui.QMessageBox.Cancel:
