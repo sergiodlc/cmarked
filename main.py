@@ -41,6 +41,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 from PySide import QtCore, QtGui
 from ui.main_window import Ui_MainWindow
+from ui.about_cmarked import Ui_Dialog as Ui_Help_About
 from contextlib import contextmanager
 import os
 
@@ -53,6 +54,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(CMarkEdMainWindow, self).__init__(parent)
         self.ui = Ui_MainWindow()
+        self.help_about = HelpAbout()
         self.ui.setupUi(self)
         self.ui.action_Save.setDisabled(True)
 
@@ -77,6 +79,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui.action_Export.triggered.connect(self.onExport)
         self.ui.sourceText.document().contentsChanged.connect(self.onDocumentWasModified)
         self.ui.action_Quit.triggered.connect(self.close)
+        self.ui.action_Help_About.triggered.connect(self.open_help_about)
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
@@ -208,7 +211,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
     def _opened_w_error(filename, mode, encoding="UTF-8"):
         try:
             f = open(filename, mode, encoding= encoding)
-        except IOError as err:
+        except (IOError, PermissionError) as err:
             yield None, err
         else:
             try:
@@ -219,6 +222,22 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
     def updateStatusBar(self):
         doc = self.ui.previewText.document()
         self.statusLabel.setText(self.status_template.format(doc.characterCount(), doc.lineCount()))
+
+    def open_help_about(self):
+        self.help_about.exec_()
+
+
+class HelpAbout(QtGui.QDialog):
+    """UI to show information about CMarked project version, license, authors, etc."""
+
+    def __init__(self, parent=None):
+        super(HelpAbout, self).__init__(parent)
+        self.ui = Ui_Help_About()
+        self.ui.setupUi(self)
+        self.addVersionNumber("0.1")
+
+    def addVersionNumber(self, version_number):
+        self.ui.label_version.setText("CMarked: Version {}.".format(version_number))
 
 
 if __name__ == "__main__":

@@ -39,7 +39,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>31</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -54,7 +54,14 @@
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="action_Help_About"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Quit">
@@ -89,6 +96,11 @@
   <action name="action_Export">
    <property name="text">
     <string>Export</string>
+   </property>
+  </action>
+  <action name="action_Help_About">
+   <property name="text">
+    <string>About CMarked</string>
    </property>
   </action>
  </widget>
