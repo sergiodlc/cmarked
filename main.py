@@ -9,6 +9,18 @@ from ctypes import CDLL, c_char_p, c_long
 import sys
 import platform
 import logging
+from contextlib import contextmanager
+import os
+
+from PySide import QtCore, QtGui
+
+try:
+    from ui.main_window import Ui_MainWindow
+    from ui.about_cmarked import Ui_Dialog as Ui_Help_About
+except ImportError:
+    from cmarked.ui.main_window import Ui_MainWindow
+    from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
+
 
 sysname = platform.system()
 
@@ -38,12 +50,6 @@ def md2html(text):
 
 
 logging.basicConfig(level=logging.DEBUG)
-
-from PySide import QtCore, QtGui
-from ui.main_window import Ui_MainWindow
-from ui.about_cmarked import Ui_Dialog as Ui_Help_About
-from contextlib import contextmanager
-import os
 
 __version__ = "0.1.0"
 
