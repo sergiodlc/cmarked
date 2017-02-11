@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=CMarkEd CommonMark (Markdown) Editor
+GenericName=CommonMark (Markdown) Editor
+X-GNOME-FullName=CMarkEd CommonMark (Markdown) Editor
+Comment=Edit CommonMark (Markdown) files with a live preview
+Exec=cmarked %f
+Terminal=false
+Type=Application
+Icon=cmarked
+Categories=GNOME;GTK;Utility;TextEditor;
+MimeType=text/markdown;text/x-markdown;
+X-AppInstall-Package=cmarked

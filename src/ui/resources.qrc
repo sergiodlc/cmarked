@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="img">
+    <file>img/markdown-208x128-solid.png</file>
+  </qresource>
+</RCC>

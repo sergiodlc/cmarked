@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main_window.ui'
 #
-# Created: Wed Jan 25 12:23:23 2017
+# Created: Tue Jan 31 17:03:27 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -34,6 +34,8 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menu_File = QtGui.QMenu(self.menubar)
         self.menu_File.setObjectName("menu_File")
+        self.menuHelp = QtGui.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -48,6 +50,8 @@ class Ui_MainWindow(object):
         self.action_Save_As.setObjectName("action_Save_As")
         self.action_Export = QtGui.QAction(MainWindow)
         self.action_Export.setObjectName("action_Export")
+        self.action_Help_About = QtGui.QAction(MainWindow)
+        self.action_Help_About.setObjectName("action_Help_About")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Save)
@@ -55,7 +59,9 @@ class Ui_MainWindow(object):
         self.menu_File.addAction(self.action_Export)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
+        self.menuHelp.addAction(self.action_Help_About)
         self.menubar.addAction(self.menu_File.menuAction())
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("textChanged()"), MainWindow.sourceTextChanged)
@@ -63,6 +69,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         self.menu_File.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setText(QtGui.QApplication.translate("MainWindow", "&Quit", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Save.setText(QtGui.QApplication.translate("MainWindow", "Save", None, QtGui.QApplication.UnicodeUTF8))
@@ -71,4 +78,5 @@ class Ui_MainWindow(object):
         self.action_Open.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+O", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Save_As.setText(QtGui.QApplication.translate("MainWindow", "Save As...", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Export.setText(QtGui.QApplication.translate("MainWindow", "Export", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Help_About.setText(QtGui.QApplication.translate("MainWindow", "About CMarked", None, QtGui.QApplication.UnicodeUTF8))
 
