@@ -240,10 +240,10 @@ class HelpAbout(QtGui.QDialog):
         super(HelpAbout, self).__init__(parent)
         self.ui = Ui_Help_About()
         self.ui.setupUi(self)
-        self.addVersionNumber("0.1")
+        self.addVersionNumber(__version__)
 
     def addVersionNumber(self, version_number):
-        self.ui.label_version.setText("CMarked: Version {}.".format(version_number))
+        self.ui.label_version.setText("CMarked: v{}.".format(version_number))
 
 
 if __name__ == "__main__":
