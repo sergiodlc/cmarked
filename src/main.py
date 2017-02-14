@@ -74,9 +74,13 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         self.connectSlots()
         self.appTitle = "CMarked"
+        self.setWindowTitle(self.appTitle + "[*]")
         self.workingFile = ""
         self.workingDirectory = ""
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
+        self.open_with_new_file = True
+        if not self.openFile():
+            self.ask_if_open_with_new_file()
 
     def connectSlots(self):
         self.ui.action_Open.triggered.connect(self.onOpenFile)
@@ -179,6 +183,49 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 self.setWindowModified(False)
                 QtGui.QApplication.restoreOverrideCursor()
 
+    def openFile(self):
+        """Open a file with commonmark data information from console"""
+        if len(sys.argv) > 1:
+            file_name = sys.argv[1]
+            file_name = os.path.join(os.getcwd(), file_name)
+            file_name = os.path.abspath(file_name)
+            if file_name.lower().endswith((".md", ".markdown", ".txt")):
+                with self._opened_w_error(file_name, 'r') as (f, err):
+                    if err:
+                        print("Error traying to open the file {}. {}".format(file_name, err))
+                        return False
+                    else:
+                        inf = f.read()
+                        workingDirectory = os.path.dirname(file_name)
+                        os.chdir(workingDirectory)
+                        self.ui.sourceText.setPlainText(inf)
+                        self.workingFile = file_name
+                        self.workingDirectory = workingDirectory
+                        self.setWindowTitle(self.appTitle + " - {}[*]".format(file_name))
+                        self.setWindowModified(False)
+                        self.open_with_new_file = False
+                        return True
+            else:
+                print("The file not have '.md', '.markdown' or '.txt' extension. Please use a proper file.")
+                return False
+        return False
+
+    def ask_if_open_with_new_file(self):
+        """
+        Print a ccosole message asking the user if want to open cmarked with a new empty file.
+
+        This function is used when openFile() function fail.
+
+        Output:
+        Return True if the user want to open cmarked with a new empty file.
+        Return False if the user not want to open cmarked with a new empty file.
+        """
+        answer = input("Do you want to open cmarked with a new empty file? Y/N (Default is Y):")
+        if str(answer).lower() == "n":
+            self.open_with_new_file = False
+        else:
+            self.open_with_new_file = True
+
     def onExport(self):
         fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Export to"),
                 "", self.tr("HTML files (*.html)"))
@@ -216,8 +263,8 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
     @contextmanager
     def _opened_w_error(filename, mode, encoding="UTF-8"):
         try:
-            f = open(filename, mode, encoding= encoding)
-        except (IOError, PermissionError) as err:
+            f = open(filename, mode, encoding=encoding)
+        except (IOError, TypeError, PermissionError) as err:
             yield None, err
         else:
             try:
@@ -246,9 +293,15 @@ class HelpAbout(QtGui.QDialog):
         self.ui.label_version.setText("CMarked: v{}.".format(version_number))
 
 
+def open_cmarked_gui():
+    myMainWindow.show()
+    sys.exit(app.exec_())
+
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     myMainWindow = CMarkEdMainWindow()
-    myMainWindow.setWindowTitle(myMainWindow.appTitle + " - new_common_mark.md[*]")
-    myMainWindow.show()
-    sys.exit(app.exec_())
+    if myMainWindow.open_with_new_file:
+        myMainWindow.setWindowTitle(myMainWindow.appTitle + " - new_common_mark.md[*]")
+        open_cmarked_gui()
+    elif myMainWindow.workingFile:
+        open_cmarked_gui()
