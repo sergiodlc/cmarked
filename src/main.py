@@ -74,9 +74,11 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         self.connectSlots()
         self.appTitle = "CMarked"
+        self.setWindowTitle(self.appTitle + " - new_common_mark.md[*]")
         self.workingFile = ""
         self.workingDirectory = ""
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
+        self.loadFile()
 
     def connectSlots(self):
         self.ui.action_Open.triggered.connect(self.onOpenFile)
@@ -179,6 +181,24 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 self.setWindowModified(False)
                 QtGui.QApplication.restoreOverrideCursor()
 
+    def loadFile(self):
+        """Open a file with commonmark data information when is passed by argument in sys.argv"""
+        if len(sys.argv) > 1:
+            file_name = sys.argv[1]
+            file_name = os.path.realpath(file_name)
+            with self._opened_w_error(file_name, 'r') as (f, err):
+                if err:
+                    pass
+                else:
+                    inf = f.read()
+                    workingDirectory = os.path.dirname(file_name)
+                    os.chdir(workingDirectory)
+                    self.ui.sourceText.setPlainText(inf)
+                    self.workingFile = file_name
+                    self.workingDirectory = workingDirectory
+                    self.setWindowTitle(self.appTitle + " - {}[*]".format(file_name))
+                    self.setWindowModified(False)
+
     def onExport(self):
         fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Export to"),
                 "", self.tr("HTML files (*.html)"))
@@ -216,8 +236,8 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
     @contextmanager
     def _opened_w_error(filename, mode, encoding="UTF-8"):
         try:
-            f = open(filename, mode, encoding= encoding)
-        except (IOError, PermissionError) as err:
+            f = open(filename, mode, encoding=encoding)
+        except (IOError, TypeError, PermissionError) as err:
             yield None, err
         else:
             try:
@@ -240,15 +260,15 @@ class HelpAbout(QtGui.QDialog):
         super(HelpAbout, self).__init__(parent)
         self.ui = Ui_Help_About()
         self.ui.setupUi(self)
-        self.addVersionNumber("0.1")
+        self.addVersionNumber(__version__)
 
     def addVersionNumber(self, version_number):
-        self.ui.label_version.setText("CMarked: Version {}.".format(version_number))
+        self.ui.label_version.setText("CMarked: v{}.".format(version_number))
 
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     myMainWindow = CMarkEdMainWindow()
-    myMainWindow.setWindowTitle(myMainWindow.appTitle + " - new_common_mark.md[*]")
     myMainWindow.show()
     sys.exit(app.exec_())
+
