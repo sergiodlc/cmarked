@@ -2,7 +2,7 @@ import os
 import sys
 import fnmatch
 import subprocess
-from setuptools import setup, find_packages
+from setuptools import setup
 from shutil import copytree, rmtree, copy
 
 
@@ -71,7 +71,7 @@ package_data["cmarked"] = src_files
 # Call the main Distutils setup command
 # -------------------------------------
 dist = setup(
-    packages=find_packages(),
+    packages=['cmarked', 'cmarked.ui'],
     package_data=package_data,
     data_files=os_files,
     include_package_data=True,
