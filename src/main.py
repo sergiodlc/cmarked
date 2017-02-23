@@ -62,6 +62,15 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui = Ui_MainWindow()
         self.help_about = HelpAbout()
         self.ui.setupUi(self)
+        # Restore Window geometry and state:
+        settings = QtCore.QSettings("CMarkEd", "CMarkEd")
+        geometry = settings.value("geometry")
+        if geometry:
+            self.restoreGeometry(geometry)
+        windowState = settings.value("windowState")
+        if windowState:
+            self.restoreState(windowState)
+
         self.ui.action_Save.setDisabled(True)
 
         self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
@@ -221,16 +230,16 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
             msgBox.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
             msgBox.setDefaultButton(QtGui.QMessageBox.Save)
             ret = msgBox.exec_()
-            if ret == QtGui.QMessageBox.Save:
-                self.onSaveFile()
-                event.accept()
-            elif ret == QtGui.QMessageBox.Discard:
-                event.accept()
-            elif ret == QtGui.QMessageBox.Cancel:
+            if ret == QtGui.QMessageBox.Cancel:
                 event.ignore()
                 msgBox.close()
-        else:
-            event.accept()
+                return
+            if ret == QtGui.QMessageBox.Save:
+                self.onSaveFile()
+        settings = QtCore.QSettings("CMarkEd", "CMarkEd")
+        settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("windowState", self.saveState())
+        event.accept()
 
     def onCopy(self):
         widget = QtGui.QApplication.instance().focusWidget()
