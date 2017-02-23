@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui'
+# Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Tue Jan 31 17:03:27 2017
+# Created: Wed Feb 22 14:09:38 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,12 +30,14 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 31))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 26))
         self.menubar.setObjectName("menubar")
         self.menu_File = QtGui.QMenu(self.menubar)
         self.menu_File.setObjectName("menu_File")
         self.menuHelp = QtGui.QMenu(self.menubar)
         self.menuHelp.setObjectName("menuHelp")
+        self.menu_Edit = QtGui.QMenu(self.menubar)
+        self.menu_Edit.setObjectName("menu_Edit")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -52,6 +54,12 @@ class Ui_MainWindow(object):
         self.action_Export.setObjectName("action_Export")
         self.action_Help_About = QtGui.QAction(MainWindow)
         self.action_Help_About.setObjectName("action_Help_About")
+        self.action_Undo = QtGui.QAction(MainWindow)
+        self.action_Undo.setEnabled(False)
+        self.action_Undo.setObjectName("action_Undo")
+        self.actionRedo = QtGui.QAction(MainWindow)
+        self.actionRedo.setEnabled(False)
+        self.actionRedo.setObjectName("actionRedo")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Save)
@@ -60,16 +68,24 @@ class Ui_MainWindow(object):
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
         self.menuHelp.addAction(self.action_Help_About)
+        self.menu_Edit.addAction(self.action_Undo)
+        self.menu_Edit.addAction(self.actionRedo)
         self.menubar.addAction(self.menu_File.menuAction())
+        self.menubar.addAction(self.menu_Edit.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("textChanged()"), MainWindow.sourceTextChanged)
+        QtCore.QObject.connect(self.action_Undo, QtCore.SIGNAL("triggered()"), self.sourceText.undo)
+        QtCore.QObject.connect(self.actionRedo, QtCore.SIGNAL("triggered()"), self.sourceText.redo)
+        QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("undoAvailable(bool)"), self.action_Undo.setEnabled)
+        QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("redoAvailable(bool)"), self.actionRedo.setEnabled)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         self.menu_File.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
+        self.menu_Edit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setText(QtGui.QApplication.translate("MainWindow", "&Quit", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Save.setText(QtGui.QApplication.translate("MainWindow", "Save", None, QtGui.QApplication.UnicodeUTF8))
@@ -79,4 +95,8 @@ class Ui_MainWindow(object):
         self.action_Save_As.setText(QtGui.QApplication.translate("MainWindow", "Save As...", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Export.setText(QtGui.QApplication.translate("MainWindow", "Export", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Help_About.setText(QtGui.QApplication.translate("MainWindow", "About CMarked", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Undo.setText(QtGui.QApplication.translate("MainWindow", "Undo", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Undo.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Z", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRedo.setText(QtGui.QApplication.translate("MainWindow", "Redo", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRedo.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Y", None, QtGui.QApplication.UnicodeUTF8))
 

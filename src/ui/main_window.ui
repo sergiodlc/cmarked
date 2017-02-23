@@ -39,7 +39,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -60,7 +60,15 @@
     </property>
     <addaction name="action_Help_About"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Undo"/>
+    <addaction name="actionRedo"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -103,6 +111,28 @@
     <string>About CMarked</string>
    </property>
   </action>
+  <action name="action_Undo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -119,6 +149,70 @@
     <hint type="destinationlabel">
      <x>800</x>
      <y>951</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_Undo</sender>
+   <signal>triggered()</signal>
+   <receiver>sourceText</receiver>
+   <slot>undo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRedo</sender>
+   <signal>triggered()</signal>
+   <receiver>sourceText</receiver>
+   <slot>redo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>undoAvailable(bool)</signal>
+   <receiver>action_Undo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>redoAvailable(bool)</signal>
+   <receiver>actionRedo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
