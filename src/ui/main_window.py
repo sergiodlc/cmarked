@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Wed Feb 22 14:09:38 2017
+# Created: Wed Feb 22 16:19:39 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -60,8 +60,19 @@ class Ui_MainWindow(object):
         self.actionRedo = QtGui.QAction(MainWindow)
         self.actionRedo.setEnabled(False)
         self.actionRedo.setObjectName("actionRedo")
+        self.actionCut = QtGui.QAction(MainWindow)
+        self.actionCut.setEnabled(False)
+        self.actionCut.setObjectName("actionCut")
+        self.actionCopy = QtGui.QAction(MainWindow)
+        self.actionCopy.setEnabled(False)
+        self.actionCopy.setObjectName("actionCopy")
+        self.actionPaste = QtGui.QAction(MainWindow)
+        self.actionPaste.setObjectName("actionPaste")
+        self.actionConvert_to_Uppercase = QtGui.QAction(MainWindow)
+        self.actionConvert_to_Uppercase.setObjectName("actionConvert_to_Uppercase")
+        self.actionConvert_to_Lowercase = QtGui.QAction(MainWindow)
+        self.actionConvert_to_Lowercase.setObjectName("actionConvert_to_Lowercase")
         self.menu_File.addAction(self.action_Open)
-        self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
         self.menu_File.addAction(self.action_Export)
@@ -70,6 +81,11 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.action_Help_About)
         self.menu_Edit.addAction(self.action_Undo)
         self.menu_Edit.addAction(self.actionRedo)
+        self.menu_Edit.addAction(self.actionCut)
+        self.menu_Edit.addAction(self.actionCopy)
+        self.menu_Edit.addAction(self.actionPaste)
+        self.menu_Edit.addAction(self.actionConvert_to_Uppercase)
+        self.menu_Edit.addAction(self.actionConvert_to_Lowercase)
         self.menubar.addAction(self.menu_File.menuAction())
         self.menubar.addAction(self.menu_Edit.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
@@ -80,6 +96,15 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionRedo, QtCore.SIGNAL("triggered()"), self.sourceText.redo)
         QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("undoAvailable(bool)"), self.action_Undo.setEnabled)
         QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("redoAvailable(bool)"), self.actionRedo.setEnabled)
+        QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("copyAvailable(bool)"), self.actionCopy.setEnabled)
+        QtCore.QObject.connect(self.previewText, QtCore.SIGNAL("copyAvailable(bool)"), self.actionCopy.setEnabled)
+        QtCore.QObject.connect(self.actionCopy, QtCore.SIGNAL("triggered()"), MainWindow.onCopy)
+        QtCore.QObject.connect(self.actionCut, QtCore.SIGNAL("triggered()"), self.sourceText.cut)
+        QtCore.QObject.connect(self.sourceText, QtCore.SIGNAL("copyAvailable(bool)"), self.actionCut.setEnabled)
+        QtCore.QObject.connect(self.actionPaste, QtCore.SIGNAL("triggered()"), self.sourceText.paste)
+        QtCore.QObject.connect(self.actionConvert_to_Uppercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToUppercase)
+        QtCore.QObject.connect(self.actionConvert_to_Lowercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToLowercase)
+        QtCore.QObject.connect(self.menu_Edit, QtCore.SIGNAL("aboutToShow()"), MainWindow.onUpdatePasteMenuState)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -93,10 +118,18 @@ class Ui_MainWindow(object):
         self.action_Open.setText(QtGui.QApplication.translate("MainWindow", "Open", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Open.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+O", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Save_As.setText(QtGui.QApplication.translate("MainWindow", "Save As...", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_Export.setText(QtGui.QApplication.translate("MainWindow", "Export", None, QtGui.QApplication.UnicodeUTF8))
-        self.action_Help_About.setText(QtGui.QApplication.translate("MainWindow", "About CMarked", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Export.setText(QtGui.QApplication.translate("MainWindow", "Export...", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Help_About.setText(QtGui.QApplication.translate("MainWindow", "About CMarked...", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Undo.setText(QtGui.QApplication.translate("MainWindow", "Undo", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Undo.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Z", None, QtGui.QApplication.UnicodeUTF8))
         self.actionRedo.setText(QtGui.QApplication.translate("MainWindow", "Redo", None, QtGui.QApplication.UnicodeUTF8))
         self.actionRedo.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Y", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCut.setText(QtGui.QApplication.translate("MainWindow", "Cut", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCut.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+X", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCopy.setText(QtGui.QApplication.translate("MainWindow", "Copy", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCopy.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+C", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionPaste.setText(QtGui.QApplication.translate("MainWindow", "Paste", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionPaste.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+V", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionConvert_to_Uppercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Uppercase", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionConvert_to_Lowercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Lowercase", None, QtGui.QApplication.UnicodeUTF8))
 

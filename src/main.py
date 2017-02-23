@@ -232,6 +232,21 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         else:
             event.accept()
 
+    def onCopy(self):
+        widget = QtGui.QApplication.instance().focusWidget()
+        if widget in (self.ui.sourceText, self.ui.previewText):
+            widget.copy()
+
+    def onConvertToUppercase(self):
+        self._filterSourceTextSelection(lambda text: text.upper())
+
+    def onConvertToLowercase(self):
+        self._filterSourceTextSelection(lambda text: text.lower())
+
+    def onUpdatePasteMenuState(self):
+        mime_data = QtGui.QApplication.instance().clipboard().mimeData()
+        self.ui.actionPaste.setEnabled(mime_data and (mime_data.hasText() or mime_data.hasHtml()))
+
     @staticmethod
     @contextmanager
     def _opened_w_error(filename, mode, encoding="UTF-8"):
@@ -244,6 +259,11 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 yield f, None
             finally:
                 f.close()
+
+    def _filterSourceTextSelection(self, func):
+        cursor = self.ui.sourceText.textCursor()
+        if cursor.hasSelection():
+            cursor.insertText(func(cursor.selectedText()))
 
     def updateStatusBar(self):
         doc = self.ui.previewText.document()
