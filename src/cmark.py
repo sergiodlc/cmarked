@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Example for using the shared library from python
+# This module wraps the shared library from python
 # Will work with either python 2 or python 3
 # Requires cmark library to be installed
 
-#from ctypes import CDLL, c_char_p, c_long
 from ctypes import *
 import sys
 import platform
@@ -181,6 +180,23 @@ iter_get_node.argtypes = [POINTER(Iter)]
 CMARK_EVENT_NONE, CMARK_EVENT_DONE, CMARK_EVENT_ENTER, CMARK_EVENT_EXIT = 0, 1, 2, 3
 def event_type(ev):
     return {0: 'CMARK_EVENT_NONE', 1: 'CMARK_EVENT_DONE', 2: 'CMARK_EVENT_ENTER', 3: 'CMARK_EVENT_EXIT'}[ev]
+
+
+def md2html(textbytes, textlen, opts):
+    ast = parse_document(textbytes, textlen, opts)
+    html = render_html(ast, opts)
+    return html, ast
+
+
+def markdown_to_html(text):
+    if sys.version_info >= (3,0):
+        textbytes = text.encode('utf-8')
+        textlen = len(textbytes)
+        return markdown(textbytes, textlen, opts).decode('utf-8')
+    else:
+        textbytes = text
+        textlen = len(text)
+        return markdown(textbytes, textlen, opts)
 
 
 def traverse(text):

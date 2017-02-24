@@ -1,13 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Example for using the shared library from python
-# Will work with either python 2 or python 3
-# Requires cmark library to be installed
-
-from ctypes import CDLL, c_char_p, c_long
 import sys
-import platform
 import logging
 from contextlib import contextmanager
 import os
@@ -21,32 +15,7 @@ except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
 
-
-sysname = platform.system()
-
-if sysname == 'Darwin':
-    libname = "libcmark.dylib"
-elif sysname == 'Windows':
-    libname = "cmark.dll"
-else:
-    libname = "libcmark.so"
-cmark = CDLL(libname)
-
-markdown = cmark.cmark_markdown_to_html
-markdown.restype = c_char_p
-markdown.argtypes = [c_char_p, c_long, c_long]
-
-opts = 0 # defaults
-
-def md2html(text):
-    if sys.version_info >= (3,0):
-        textbytes = text.encode('utf-8')
-        textlen = len(textbytes)
-        return markdown(textbytes, textlen, opts).decode('utf-8')
-    else:
-        textbytes = text
-        textlen = len(text)
-        return markdown(textbytes, textlen, opts)
+from . import cmark
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -113,7 +82,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
     def sourceTextChanged(self):
         preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
-        rendered = md2html(self.ui.sourceText.toPlainText())
+        rendered, ast = cmark.markdown_to_html(self.ui.sourceText.toPlainText())
         self.ui.previewText.setHtml(rendered)
         if preview_pos is not None:
             self.vPreviewScrollBar.setValue(preview_pos)
