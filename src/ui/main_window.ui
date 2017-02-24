@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string/>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/img/img/markdown-32x32-orange.png</normaloff>:/img/img/markdown-32x32-orange.png</iconset>
+  </property>
   <property name="windowFilePath">
    <string/>
   </property>
@@ -178,7 +182,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>sourceText</sender>

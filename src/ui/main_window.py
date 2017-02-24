@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Wed Feb 22 16:19:39 2017
+# Created: Thu Feb 23 20:13:48 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -14,6 +14,9 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1475, 980)
         MainWindow.setWindowTitle("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/img/img/markdown-32x32-orange.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setWindowFilePath("")
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -133,3 +136,4 @@ class Ui_MainWindow(object):
         self.actionConvert_to_Uppercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Uppercase", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Lowercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Lowercase", None, QtGui.QApplication.UnicodeUTF8))
 
+from . import resources_rc

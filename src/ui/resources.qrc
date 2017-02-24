@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="img">
     <file>img/markdown-208x128-solid.png</file>
+    <file>img/markdown-32x32-orange.png</file>
   </qresource>
 </RCC>
