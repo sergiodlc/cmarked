@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string/>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/img/img/markdown-32x32-orange.png</normaloff>:/img/img/markdown-32x32-orange.png</iconset>
+  </property>
   <property name="windowFilePath">
    <string/>
   </property>
@@ -39,7 +43,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -47,7 +51,6 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
-    <addaction name="separator"/>
     <addaction name="action_Save"/>
     <addaction name="action_Save_As"/>
     <addaction name="action_Export"/>
@@ -60,7 +63,20 @@
     </property>
     <addaction name="action_Help_About"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="action_Undo"/>
+    <addaction name="actionRedo"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
+    <addaction name="actionConvert_to_Uppercase"/>
+    <addaction name="actionConvert_to_Lowercase"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -95,16 +111,80 @@
   </action>
   <action name="action_Export">
    <property name="text">
-    <string>Export</string>
+    <string>Export...</string>
    </property>
   </action>
   <action name="action_Help_About">
    <property name="text">
-    <string>About CMarked</string>
+    <string>About CMarked...</string>
+   </property>
+  </action>
+  <action name="action_Undo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Cut</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Copy</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionConvert_to_Uppercase">
+   <property name="text">
+    <string>Convert to Uppercase</string>
+   </property>
+  </action>
+  <action name="actionConvert_to_Lowercase">
+   <property name="text">
+    <string>Convert to Lowercase</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>sourceText</sender>
@@ -122,8 +202,220 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>action_Undo</sender>
+   <signal>triggered()</signal>
+   <receiver>sourceText</receiver>
+   <slot>undo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRedo</sender>
+   <signal>triggered()</signal>
+   <receiver>sourceText</receiver>
+   <slot>redo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>undoAvailable(bool)</signal>
+   <receiver>action_Undo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>redoAvailable(bool)</signal>
+   <receiver>actionRedo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>copyAvailable(bool)</signal>
+   <receiver>actionCopy</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>347</x>
+     <y>717</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>previewText</sender>
+   <signal>copyAvailable(bool)</signal>
+   <receiver>actionCopy</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1193</x>
+     <y>753</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCopy</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onCopy()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCut</sender>
+   <signal>triggered()</signal>
+   <receiver>sourceText</receiver>
+   <slot>cut()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>copyAvailable(bool)</signal>
+   <receiver>actionCut</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPaste</sender>
+   <signal>triggered()</signal>
+   <receiver>sourceText</receiver>
+   <slot>paste()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>371</x>
+     <y>490</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionConvert_to_Uppercase</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onConvertToUppercase()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionConvert_to_Lowercase</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onConvertToLowercase()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>menu_Edit</sender>
+   <signal>aboutToShow()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onUpdatePasteMenuState()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>sourceTextChanged()</slot>
+  <slot>onCopy()</slot>
+  <slot>onUpdatePasteMenuState()</slot>
+  <slot>onConvertToUppercase()</slot>
+  <slot>onConvertToLowercase()</slot>
  </slots>
 </ui>
