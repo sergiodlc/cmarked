@@ -11,9 +11,11 @@ import platform
 import logging
 from contextlib import contextmanager
 import os
-
+import logging
+import weasyprint
+from weasyprint import HTML
+logger = weasyprint.LOGGER.warning = lambda *a, **kw: None
 from PySide import QtCore, QtGui
-
 try:
     from ui.main_window import Ui_MainWindow
     from ui.about_cmarked import Ui_Dialog as Ui_Help_About
@@ -104,7 +106,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui.action_Vertical_Layout.changed.connect(self.onVerticalLayout)
         self.ui.action_Swap_Views.changed.connect(self.onSwapViews)
         self.ui.action_Change_Editor_Font.triggered.connect(self.onChangeEditorFont)
-
+        self.ui.action_Export_as_PDF.triggered.connect(self.onExportAsPDF)
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
@@ -137,6 +139,14 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
             settings = QtCore.QSettings("CMarkEd", "CMarkEd")
             settings.setValue("editorFont", font)
             self.ui.sourceText.setFont(font)
+
+    def onExportAsPDF(self):
+        fileName, filtr = QtGui.QFileDialog.getSaveFileName(self,
+                self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
+        if fileName:
+            QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+            HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName) 
+            QtGui.QApplication.restoreOverrideCursor()
 
     def onSourceScrollChanged(self):
         if self.vPreviewScrollBar and self.vSourceScrollBar:

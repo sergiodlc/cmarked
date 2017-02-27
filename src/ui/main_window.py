@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/main_window.ui'
 #
-# Created: Mon Feb 27 15:34:13 2017
+# Created: Mon Feb 27 17:07:30 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -86,10 +86,13 @@ class Ui_MainWindow(object):
         self.action_Live_Preview.setObjectName("action_Live_Preview")
         self.action_Change_Editor_Font = QtGui.QAction(MainWindow)
         self.action_Change_Editor_Font.setObjectName("action_Change_Editor_Font")
+        self.action_Export_as_PDF = QtGui.QAction(MainWindow)
+        self.action_Export_as_PDF.setObjectName("action_Export_as_PDF")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
         self.menu_File.addAction(self.action_Export)
+        self.menu_File.addAction(self.action_Export_as_PDF)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
         self.menuHelp.addAction(self.action_Help_About)
@@ -156,4 +159,5 @@ class Ui_MainWindow(object):
         self.action_Swap_Views.setText(QtGui.QApplication.translate("MainWindow", "Swap Views", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Live_Preview.setText(QtGui.QApplication.translate("MainWindow", "Live Preview", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Change_Editor_Font.setText(QtGui.QApplication.translate("MainWindow", "Change Editor Font", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Export_as_PDF.setText(QtGui.QApplication.translate("MainWindow", "Export as PDF", None, QtGui.QApplication.UnicodeUTF8))
 
