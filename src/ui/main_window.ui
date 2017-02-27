@@ -13,10 +13,6 @@
   <property name="windowTitle">
    <string/>
   </property>
-  <property name="windowIcon">
-   <iconset resource="resources.qrc">
-    <normaloff>:/img/img/markdown-32x32-orange.png</normaloff>:/img/img/markdown-32x32-orange.png</iconset>
-  </property>
   <property name="windowFilePath">
    <string/>
   </property>
@@ -43,7 +39,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -82,6 +78,8 @@
     <addaction name="action_Live_Preview"/>
     <addaction name="action_Vertical_Layout"/>
     <addaction name="action_Swap_Views"/>
+    <addaction name="separator"/>
+    <addaction name="action_Change_Editor_Font"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -217,10 +215,13 @@
     <string>Live Preview</string>
    </property>
   </action>
+  <action name="action_Change_Editor_Font">
+   <property name="text">
+    <string>Change Editor Font</string>
+   </property>
+  </action>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>sourceText</sender>
@@ -423,22 +424,6 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>737</x>
-     <y>489</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>menu_Edit</sender>
-   <signal>aboutToShow()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>onUpdatePasteMenuState()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>90</x>
-     <y>134</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>

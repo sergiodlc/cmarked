@@ -65,6 +65,9 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         # Restore Window geometry and state:
         settings = QtCore.QSettings("CMarkEd", "CMarkEd")
         geometry = settings.value("geometry")
+        editorFont = settings.value("editorFont")
+        if editorFont:
+            self.ui.sourceText.setFont(editorFont)
         if geometry:
             self.restoreGeometry(geometry)
         windowState = settings.value("windowState")
@@ -75,7 +78,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
         self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
-
+        
         # Set up the status bar:
         self.status_template = self.tr('Chars: {0}, Ln: {1}')
         self.statusLabel = QtGui.QLabel(self.status_template.format(0, 0))
@@ -100,6 +103,8 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui.action_Live_Preview.changed.connect(self.onLivePreview)
         self.ui.action_Vertical_Layout.changed.connect(self.onVerticalLayout)
         self.ui.action_Swap_Views.changed.connect(self.onSwapViews)
+        self.ui.action_Change_Editor_Font.triggered.connect(self.onChangeEditorFont)
+
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
@@ -125,6 +130,13 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         else:
             previewText = self.ui.splitter.widget(0)
             self.ui.splitter.addWidget(previewText)
+
+    def onChangeEditorFont(self):
+        font, ok = QtGui.QFontDialog.getFont(self.ui.sourceText.font())
+        if ok:
+            settings = QtCore.QSettings("CMarkEd", "CMarkEd")
+            settings.setValue("editorFont", font)
+            self.ui.sourceText.setFont(font)
 
     def onSourceScrollChanged(self):
         if self.vPreviewScrollBar and self.vSourceScrollBar:

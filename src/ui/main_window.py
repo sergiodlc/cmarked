@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui/main_window.ui'
 #
-# Created: Mon Feb 27 15:03:50 2017
+# Created: Mon Feb 27 15:34:13 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -14,9 +14,6 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1475, 980)
         MainWindow.setWindowTitle("")
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/img/img/markdown-32x32-orange.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        MainWindow.setWindowIcon(icon)
         MainWindow.setWindowFilePath("")
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -33,7 +30,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 25))
         self.menubar.setObjectName("menubar")
         self.menu_File = QtGui.QMenu(self.menubar)
         self.menu_File.setObjectName("menu_File")
@@ -87,6 +84,8 @@ class Ui_MainWindow(object):
         self.action_Live_Preview.setCheckable(True)
         self.action_Live_Preview.setChecked(True)
         self.action_Live_Preview.setObjectName("action_Live_Preview")
+        self.action_Change_Editor_Font = QtGui.QAction(MainWindow)
+        self.action_Change_Editor_Font.setObjectName("action_Change_Editor_Font")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
@@ -104,6 +103,8 @@ class Ui_MainWindow(object):
         self.menuView.addAction(self.action_Live_Preview)
         self.menuView.addAction(self.action_Vertical_Layout)
         self.menuView.addAction(self.action_Swap_Views)
+        self.menuView.addSeparator()
+        self.menuView.addAction(self.action_Change_Editor_Font)
         self.menubar.addAction(self.menu_File.menuAction())
         self.menubar.addAction(self.menu_Edit.menuAction())
         self.menubar.addAction(self.menuView.menuAction())
@@ -123,7 +124,6 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionPaste, QtCore.SIGNAL("triggered()"), self.sourceText.paste)
         QtCore.QObject.connect(self.actionConvert_to_Uppercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToUppercase)
         QtCore.QObject.connect(self.actionConvert_to_Lowercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToLowercase)
-        QtCore.QObject.connect(self.menu_Edit, QtCore.SIGNAL("aboutToShow()"), MainWindow.onUpdatePasteMenuState)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -155,5 +155,5 @@ class Ui_MainWindow(object):
         self.action_Vertical_Layout.setText(QtGui.QApplication.translate("MainWindow", "Vertical Layout", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Swap_Views.setText(QtGui.QApplication.translate("MainWindow", "Swap Views", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Live_Preview.setText(QtGui.QApplication.translate("MainWindow", "Live Preview", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Change_Editor_Font.setText(QtGui.QApplication.translate("MainWindow", "Change Editor Font", None, QtGui.QApplication.UnicodeUTF8))
 
-from . import resources_rc
