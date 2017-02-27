@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/ui/main_window.ui'
+# Form implementation generated from reading ui file 'ui/main_window.ui'
 #
-# Created: Thu Feb 23 20:13:48 2017
+# Created: Mon Feb 27 15:03:50 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,6 +41,8 @@ class Ui_MainWindow(object):
         self.menuHelp.setObjectName("menuHelp")
         self.menu_Edit = QtGui.QMenu(self.menubar)
         self.menu_Edit.setObjectName("menu_Edit")
+        self.menuView = QtGui.QMenu(self.menubar)
+        self.menuView.setObjectName("menuView")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -75,6 +77,16 @@ class Ui_MainWindow(object):
         self.actionConvert_to_Uppercase.setObjectName("actionConvert_to_Uppercase")
         self.actionConvert_to_Lowercase = QtGui.QAction(MainWindow)
         self.actionConvert_to_Lowercase.setObjectName("actionConvert_to_Lowercase")
+        self.action_Vertical_Layout = QtGui.QAction(MainWindow)
+        self.action_Vertical_Layout.setCheckable(True)
+        self.action_Vertical_Layout.setObjectName("action_Vertical_Layout")
+        self.action_Swap_Views = QtGui.QAction(MainWindow)
+        self.action_Swap_Views.setCheckable(True)
+        self.action_Swap_Views.setObjectName("action_Swap_Views")
+        self.action_Live_Preview = QtGui.QAction(MainWindow)
+        self.action_Live_Preview.setCheckable(True)
+        self.action_Live_Preview.setChecked(True)
+        self.action_Live_Preview.setObjectName("action_Live_Preview")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
@@ -89,8 +101,12 @@ class Ui_MainWindow(object):
         self.menu_Edit.addAction(self.actionPaste)
         self.menu_Edit.addAction(self.actionConvert_to_Uppercase)
         self.menu_Edit.addAction(self.actionConvert_to_Lowercase)
+        self.menuView.addAction(self.action_Live_Preview)
+        self.menuView.addAction(self.action_Vertical_Layout)
+        self.menuView.addAction(self.action_Swap_Views)
         self.menubar.addAction(self.menu_File.menuAction())
         self.menubar.addAction(self.menu_Edit.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -114,6 +130,7 @@ class Ui_MainWindow(object):
         self.menu_File.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Edit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setText(QtGui.QApplication.translate("MainWindow", "&Quit", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Save.setText(QtGui.QApplication.translate("MainWindow", "Save", None, QtGui.QApplication.UnicodeUTF8))
@@ -135,5 +152,8 @@ class Ui_MainWindow(object):
         self.actionPaste.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+V", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Uppercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Uppercase", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Lowercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Lowercase", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Vertical_Layout.setText(QtGui.QApplication.translate("MainWindow", "Vertical Layout", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Swap_Views.setText(QtGui.QApplication.translate("MainWindow", "Swap Views", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Live_Preview.setText(QtGui.QApplication.translate("MainWindow", "Live Preview", None, QtGui.QApplication.UnicodeUTF8))
 
 from . import resources_rc

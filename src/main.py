@@ -97,10 +97,34 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui.sourceText.document().contentsChanged.connect(self.onDocumentWasModified)
         self.ui.action_Quit.triggered.connect(self.close)
         self.ui.action_Help_About.triggered.connect(self.open_help_about)
+        self.ui.action_Live_Preview.changed.connect(self.onLivePreview)
+        self.ui.action_Vertical_Layout.changed.connect(self.onVerticalLayout)
+        self.ui.action_Swap_Views.changed.connect(self.onSwapViews)
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
         self.ui.previewText.textChanged.connect(self.updateStatusBar)
+
+    def onLivePreview(self):
+        if self.ui.action_Live_Preview.isChecked():
+            self.ui.previewText.show()
+            self.sourceTextChanged()
+        else:
+            self.ui.previewText.hide()
+
+    def onVerticalLayout(self):
+        if self.ui.action_Vertical_Layout.isChecked():
+            self.ui.splitter.setOrientation(QtCore.Qt.Vertical) 
+        else:
+            self.ui.splitter.setOrientation(QtCore.Qt.Horizontal)
+
+    def onSwapViews(self):
+        if self.ui.action_Live_Preview.isChecked():
+            sourceText = self.ui.splitter.widget(0)
+            self.ui.splitter.addWidget(sourceText)
+        else:
+            previewText = self.ui.splitter.widget(0)
+            self.ui.splitter.addWidget(previewText)
 
     def onSourceScrollChanged(self):
         if self.vPreviewScrollBar and self.vSourceScrollBar:
@@ -112,11 +136,12 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 pass
 
     def sourceTextChanged(self):
-        preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
-        rendered = md2html(self.ui.sourceText.toPlainText())
-        self.ui.previewText.setHtml(rendered)
-        if preview_pos is not None:
-            self.vPreviewScrollBar.setValue(preview_pos)
+        if not self.ui.previewText.isHidden():
+            preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
+            rendered = md2html(self.ui.sourceText.toPlainText())
+            self.ui.previewText.setHtml(rendered)
+            if preview_pos is not None:
+                self.vPreviewScrollBar.setValue(preview_pos)
 
     def onDocumentWasModified(self):
         self.setWindowModified(self.ui.sourceText.document().isModified())
