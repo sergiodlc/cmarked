@@ -30,6 +30,19 @@ SETUP = {
     "author_email":  'sergiodlc@gmail.com, armando.p.labrador@gmail.com',
     "url":  'https://github.com/sergiodlc/cmarked',
     "license":  'MIT',
+    "classifiers": [
+        "Development Status :: 4 - Beta",
+        "Environment :: X11 Applications",
+        "Environment :: X11 Applications :: Qt",
+        "Intended Audience :: End Users/Desktop",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        "Topic :: Documentation",
+        "Topic :: Text Editors",
+        "Topic :: Text Processing :: Markup",
+    ],
 }
 
 # Boolean: running as root?
