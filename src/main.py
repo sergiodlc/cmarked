@@ -12,9 +12,6 @@ import logging
 from contextlib import contextmanager
 import os
 import logging
-import weasyprint
-from weasyprint import HTML
-logger = weasyprint.LOGGER.warning = lambda *a, **kw: None
 from PySide import QtCore, QtGui
 try:
     from ui.main_window import Ui_MainWindow
@@ -141,12 +138,21 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
             self.ui.sourceText.setFont(font)
 
     def onExportAsPDF(self):
-        fileName, filtr = QtGui.QFileDialog.getSaveFileName(self,
+        try:
+            import weasyprint
+            from weasyprint import HTML
+            logger = weasyprint.LOGGER.warning = lambda *a, **kw: None
+
+            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self,
                 self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
-        if fileName:
-            QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-            HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName) 
-            QtGui.QApplication.restoreOverrideCursor()
+            if fileName:
+                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName) 
+                QtGui.QApplication.restoreOverrideCursor()
+        except ImportError:
+            message = "You need to install 'weasyprint' in order to use this functionality."
+            QtGui.QMessageBox.warning(self, self.tr("Application"),
+                                      self.tr(message))
 
     def onSourceScrollChanged(self):
         if self.vPreviewScrollBar and self.vSourceScrollBar:
