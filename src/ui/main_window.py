@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Mon Mar  6 14:50:26 2017
+# Created: Mon Mar  6 15:06:02 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -91,6 +91,10 @@ class Ui_MainWindow(object):
         self.action_Change_Editor_Font.setObjectName("action_Change_Editor_Font")
         self.action_Export_as_PDF = QtGui.QAction(MainWindow)
         self.action_Export_as_PDF.setObjectName("action_Export_as_PDF")
+        self.actionCommonMark_Tutorial = QtGui.QAction(MainWindow)
+        self.actionCommonMark_Tutorial.setObjectName("actionCommonMark_Tutorial")
+        self.actionCommonMark_Reference = QtGui.QAction(MainWindow)
+        self.actionCommonMark_Reference.setObjectName("actionCommonMark_Reference")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
@@ -98,6 +102,8 @@ class Ui_MainWindow(object):
         self.menu_File.addAction(self.action_Export_as_PDF)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
+        self.menuHelp.addAction(self.actionCommonMark_Tutorial)
+        self.menuHelp.addAction(self.actionCommonMark_Reference)
         self.menuHelp.addAction(self.action_Help_About)
         self.menu_Edit.addAction(self.action_Undo)
         self.menu_Edit.addAction(self.actionRedo)
@@ -131,6 +137,8 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionConvert_to_Uppercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToUppercase)
         QtCore.QObject.connect(self.actionConvert_to_Lowercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToLowercase)
         QtCore.QObject.connect(self.menu_Edit, QtCore.SIGNAL("aboutToShow()"), MainWindow.onUpdatePasteMenuState)
+        QtCore.QObject.connect(self.actionCommonMark_Tutorial, QtCore.SIGNAL("triggered()"), MainWindow.onOpenCommonMarkTutorial)
+        QtCore.QObject.connect(self.actionCommonMark_Reference, QtCore.SIGNAL("triggered()"), MainWindow.onOpenCommonMarkReference)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -164,5 +172,7 @@ class Ui_MainWindow(object):
         self.action_Live_Preview.setText(QtGui.QApplication.translate("MainWindow", "Live Preview", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Change_Editor_Font.setText(QtGui.QApplication.translate("MainWindow", "Change Editor Font", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Export_as_PDF.setText(QtGui.QApplication.translate("MainWindow", "Export as PDF", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCommonMark_Tutorial.setText(QtGui.QApplication.translate("MainWindow", "CommonMark &Tutorial", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCommonMark_Reference.setText(QtGui.QApplication.translate("MainWindow", "CommonMark &Reference", None, QtGui.QApplication.UnicodeUTF8))
 
 from . import resources_rc

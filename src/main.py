@@ -5,14 +5,17 @@
 # Will work with either python 2 or python 3
 # Requires cmark library to be installed
 
-from ctypes import CDLL, c_char_p, c_long
 import sys
 import platform
 import logging
-from contextlib import contextmanager
 import os
 import logging
+import webbrowser
+from contextlib import contextmanager
+from ctypes import CDLL, c_char_p, c_long
+
 from PySide import QtCore, QtGui
+
 try:
     from ui.main_window import Ui_MainWindow
     from ui.about_cmarked import Ui_Dialog as Ui_Help_About
@@ -77,7 +80,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
         self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
-        
+
         # Set up the status bar:
         self.status_template = self.tr('Chars: {0}, Ln: {1}')
         self.statusLabel = QtGui.QLabel(self.status_template.format(0, 0))
@@ -118,7 +121,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
     def onVerticalLayout(self):
         if self.ui.action_Vertical_Layout.isChecked():
-            self.ui.splitter.setOrientation(QtCore.Qt.Vertical) 
+            self.ui.splitter.setOrientation(QtCore.Qt.Vertical)
         else:
             self.ui.splitter.setOrientation(QtCore.Qt.Horizontal)
 
@@ -147,7 +150,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
             if fileName:
                 QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName) 
+                HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName)
                 QtGui.QApplication.restoreOverrideCursor()
         except ImportError:
             message = "You need to install 'weasyprint' in order to use this functionality."
@@ -333,6 +336,12 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
     def open_help_about(self):
         self.help_about.exec_()
+
+    def onOpenCommonMarkTutorial(self):
+        webbrowser.open_new_tab("http://commonmark.org/help/tutorial/")
+
+    def onOpenCommonMarkReference(self):
+        webbrowser.open_new_tab("http://commonmark.org/help/")
 
 
 class HelpAbout(QtGui.QDialog):

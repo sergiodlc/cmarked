@@ -62,6 +62,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionCommonMark_Tutorial"/>
+    <addaction name="actionCommonMark_Reference"/>
     <addaction name="action_Help_About"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
@@ -228,6 +230,16 @@
   <action name="action_Export_as_PDF">
    <property name="text">
     <string>Export as PDF</string>
+   </property>
+  </action>
+  <action name="actionCommonMark_Tutorial">
+   <property name="text">
+    <string>CommonMark &amp;Tutorial</string>
+   </property>
+  </action>
+  <action name="actionCommonMark_Reference">
+   <property name="text">
+    <string>CommonMark &amp;Reference</string>
    </property>
   </action>
  </widget>
@@ -459,6 +471,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCommonMark_Tutorial</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onOpenCommonMarkTutorial()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCommonMark_Reference</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onOpenCommonMarkReference()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>sourceTextChanged()</slot>
@@ -466,5 +510,7 @@
   <slot>onUpdatePasteMenuState()</slot>
   <slot>onConvertToUppercase()</slot>
   <slot>onConvertToLowercase()</slot>
+  <slot>onOpenCommonMarkTutorial()</slot>
+  <slot>onOpenCommonMarkReference()</slot>
  </slots>
 </ui>
