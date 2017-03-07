@@ -54,6 +54,7 @@
     <addaction name="action_Save"/>
     <addaction name="action_Save_As"/>
     <addaction name="action_Export"/>
+    <addaction name="action_Export_as_PDF"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -61,6 +62,8 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionCommonMark_Tutorial"/>
+    <addaction name="actionCommonMark_Reference"/>
     <addaction name="action_Help_About"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
@@ -75,8 +78,19 @@
     <addaction name="actionConvert_to_Uppercase"/>
     <addaction name="actionConvert_to_Lowercase"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="action_Live_Preview"/>
+    <addaction name="action_Vertical_Layout"/>
+    <addaction name="action_Swap_Views"/>
+    <addaction name="separator"/>
+    <addaction name="action_Change_Editor_Font"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -179,6 +193,53 @@
   <action name="actionConvert_to_Lowercase">
    <property name="text">
     <string>Convert to Lowercase</string>
+   </property>
+  </action>
+  <action name="action_Vertical_Layout">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Vertical Layout</string>
+   </property>
+  </action>
+  <action name="action_Swap_Views">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Swap Views</string>
+   </property>
+  </action>
+  <action name="action_Live_Preview">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Live Preview</string>
+   </property>
+  </action>
+  <action name="action_Change_Editor_Font">
+   <property name="text">
+    <string>Change Editor Font</string>
+   </property>
+  </action>
+  <action name="action_Export_as_PDF">
+   <property name="text">
+    <string>Export as PDF</string>
+   </property>
+  </action>
+  <action name="actionCommonMark_Tutorial">
+   <property name="text">
+    <string>CommonMark &amp;Tutorial</string>
+   </property>
+  </action>
+  <action name="actionCommonMark_Reference">
+   <property name="text">
+    <string>CommonMark &amp;Reference</string>
    </property>
   </action>
  </widget>
@@ -410,6 +471,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCommonMark_Tutorial</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onOpenCommonMarkTutorial()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCommonMark_Reference</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onOpenCommonMarkReference()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>sourceTextChanged()</slot>
@@ -417,5 +510,7 @@
   <slot>onUpdatePasteMenuState()</slot>
   <slot>onConvertToUppercase()</slot>
   <slot>onConvertToLowercase()</slot>
+  <slot>onOpenCommonMarkTutorial()</slot>
+  <slot>onOpenCommonMarkReference()</slot>
  </slots>
 </ui>
