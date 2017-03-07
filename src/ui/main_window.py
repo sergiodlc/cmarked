@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/main_window.ui'
+# Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Mon Feb 27 17:07:30 2017
+# Created: Mon Mar  6 14:50:26 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -14,6 +14,9 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1475, 980)
         MainWindow.setWindowTitle("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/img/img/markdown-32x32-orange.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setWindowFilePath("")
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -30,7 +33,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 26))
         self.menubar.setObjectName("menubar")
         self.menu_File = QtGui.QMenu(self.menubar)
         self.menu_File.setObjectName("menu_File")
@@ -127,6 +130,7 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionPaste, QtCore.SIGNAL("triggered()"), self.sourceText.paste)
         QtCore.QObject.connect(self.actionConvert_to_Uppercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToUppercase)
         QtCore.QObject.connect(self.actionConvert_to_Lowercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToLowercase)
+        QtCore.QObject.connect(self.menu_Edit, QtCore.SIGNAL("aboutToShow()"), MainWindow.onUpdatePasteMenuState)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -161,3 +165,4 @@ class Ui_MainWindow(object):
         self.action_Change_Editor_Font.setText(QtGui.QApplication.translate("MainWindow", "Change Editor Font", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Export_as_PDF.setText(QtGui.QApplication.translate("MainWindow", "Export as PDF", None, QtGui.QApplication.UnicodeUTF8))
 
+from . import resources_rc

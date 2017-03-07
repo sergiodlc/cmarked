@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string/>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/img/img/markdown-32x32-orange.png</normaloff>:/img/img/markdown-32x32-orange.png</iconset>
+  </property>
   <property name="windowFilePath">
    <string/>
   </property>
@@ -39,7 +43,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -227,7 +231,9 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>sourceText</sender>
@@ -430,6 +436,22 @@
     <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>737</x>
+     <y>489</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>menu_Edit</sender>
+   <signal>aboutToShow()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onUpdatePasteMenuState()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>134</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>
