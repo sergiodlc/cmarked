@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Thu Feb 23 20:13:48 2017
+# Created: Mon Mar  6 15:06:02 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,6 +41,8 @@ class Ui_MainWindow(object):
         self.menuHelp.setObjectName("menuHelp")
         self.menu_Edit = QtGui.QMenu(self.menubar)
         self.menu_Edit.setObjectName("menu_Edit")
+        self.menuView = QtGui.QMenu(self.menubar)
+        self.menuView.setObjectName("menuView")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -75,12 +77,33 @@ class Ui_MainWindow(object):
         self.actionConvert_to_Uppercase.setObjectName("actionConvert_to_Uppercase")
         self.actionConvert_to_Lowercase = QtGui.QAction(MainWindow)
         self.actionConvert_to_Lowercase.setObjectName("actionConvert_to_Lowercase")
+        self.action_Vertical_Layout = QtGui.QAction(MainWindow)
+        self.action_Vertical_Layout.setCheckable(True)
+        self.action_Vertical_Layout.setObjectName("action_Vertical_Layout")
+        self.action_Swap_Views = QtGui.QAction(MainWindow)
+        self.action_Swap_Views.setCheckable(True)
+        self.action_Swap_Views.setObjectName("action_Swap_Views")
+        self.action_Live_Preview = QtGui.QAction(MainWindow)
+        self.action_Live_Preview.setCheckable(True)
+        self.action_Live_Preview.setChecked(True)
+        self.action_Live_Preview.setObjectName("action_Live_Preview")
+        self.action_Change_Editor_Font = QtGui.QAction(MainWindow)
+        self.action_Change_Editor_Font.setObjectName("action_Change_Editor_Font")
+        self.action_Export_as_PDF = QtGui.QAction(MainWindow)
+        self.action_Export_as_PDF.setObjectName("action_Export_as_PDF")
+        self.actionCommonMark_Tutorial = QtGui.QAction(MainWindow)
+        self.actionCommonMark_Tutorial.setObjectName("actionCommonMark_Tutorial")
+        self.actionCommonMark_Reference = QtGui.QAction(MainWindow)
+        self.actionCommonMark_Reference.setObjectName("actionCommonMark_Reference")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
         self.menu_File.addAction(self.action_Export)
+        self.menu_File.addAction(self.action_Export_as_PDF)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
+        self.menuHelp.addAction(self.actionCommonMark_Tutorial)
+        self.menuHelp.addAction(self.actionCommonMark_Reference)
         self.menuHelp.addAction(self.action_Help_About)
         self.menu_Edit.addAction(self.action_Undo)
         self.menu_Edit.addAction(self.actionRedo)
@@ -89,8 +112,14 @@ class Ui_MainWindow(object):
         self.menu_Edit.addAction(self.actionPaste)
         self.menu_Edit.addAction(self.actionConvert_to_Uppercase)
         self.menu_Edit.addAction(self.actionConvert_to_Lowercase)
+        self.menuView.addAction(self.action_Live_Preview)
+        self.menuView.addAction(self.action_Vertical_Layout)
+        self.menuView.addAction(self.action_Swap_Views)
+        self.menuView.addSeparator()
+        self.menuView.addAction(self.action_Change_Editor_Font)
         self.menubar.addAction(self.menu_File.menuAction())
         self.menubar.addAction(self.menu_Edit.menuAction())
+        self.menubar.addAction(self.menuView.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -108,12 +137,15 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionConvert_to_Uppercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToUppercase)
         QtCore.QObject.connect(self.actionConvert_to_Lowercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToLowercase)
         QtCore.QObject.connect(self.menu_Edit, QtCore.SIGNAL("aboutToShow()"), MainWindow.onUpdatePasteMenuState)
+        QtCore.QObject.connect(self.actionCommonMark_Tutorial, QtCore.SIGNAL("triggered()"), MainWindow.onOpenCommonMarkTutorial)
+        QtCore.QObject.connect(self.actionCommonMark_Reference, QtCore.SIGNAL("triggered()"), MainWindow.onOpenCommonMarkReference)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         self.menu_File.setTitle(QtGui.QApplication.translate("MainWindow", "&File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuHelp.setTitle(QtGui.QApplication.translate("MainWindow", "Help", None, QtGui.QApplication.UnicodeUTF8))
         self.menu_Edit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuView.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setText(QtGui.QApplication.translate("MainWindow", "&Quit", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Quit.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+Q", None, QtGui.QApplication.UnicodeUTF8))
         self.action_Save.setText(QtGui.QApplication.translate("MainWindow", "Save", None, QtGui.QApplication.UnicodeUTF8))
@@ -135,5 +167,12 @@ class Ui_MainWindow(object):
         self.actionPaste.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+V", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Uppercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Uppercase", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Lowercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Lowercase", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Vertical_Layout.setText(QtGui.QApplication.translate("MainWindow", "Vertical Layout", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Swap_Views.setText(QtGui.QApplication.translate("MainWindow", "Swap Views", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Live_Preview.setText(QtGui.QApplication.translate("MainWindow", "Live Preview", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Change_Editor_Font.setText(QtGui.QApplication.translate("MainWindow", "Change Editor Font", None, QtGui.QApplication.UnicodeUTF8))
+        self.action_Export_as_PDF.setText(QtGui.QApplication.translate("MainWindow", "Export as PDF", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCommonMark_Tutorial.setText(QtGui.QApplication.translate("MainWindow", "CommonMark &Tutorial", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionCommonMark_Reference.setText(QtGui.QApplication.translate("MainWindow", "CommonMark &Reference", None, QtGui.QApplication.UnicodeUTF8))
 
 from . import resources_rc

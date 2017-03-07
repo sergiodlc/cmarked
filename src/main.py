@@ -5,12 +5,14 @@
 # Will work with either python 2 or python 3
 # Requires cmark library to be installed
 
-from ctypes import CDLL, c_char_p, c_long
 import sys
 import platform
 import logging
-from contextlib import contextmanager
 import os
+import logging
+import webbrowser
+from contextlib import contextmanager
+from ctypes import CDLL, c_char_p, c_long
 
 from PySide import QtCore, QtGui
 
@@ -51,7 +53,7 @@ def md2html(text):
 
 logging.basicConfig(level=logging.DEBUG)
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 foghorn = '@import url(http://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic&subset=latin);ol,ul{padding-left:1.2em}body,code,html{background:#fff}body,h1 a,h1 a:hover{color:#333}a,h1 a,h1 a:hover{text-decoration:none}hr,video{margin:2em 0}h1,h2,p#heart{text-align:center}table tr td,table tr th{border:1px solid #ccc;text-align:left;padding:6px 13px;margin:0}h1,p,table tr td :first-child,table tr th :first-child{margin-top:0}pre code,table,table tr{padding:0}body,html{padding:1em;margin:auto}body{font:1.3em Vollkorn,Palatino,Times;line-height:1;text-align:justify}h1,h2,h3{font-weight:400}h3,nav{font-style:italic}code,nav{font-size:.9em}article,footer,header,nav{margin:0 auto}article{margin-top:4em;margin-bottom:4em;min-height:400px}footer{margin-bottom:50px}video{border:1px solid #ddd}nav{border-bottom:1px solid #ddd;padding:1em 0}nav p{margin:0}p{-webkit-hypens:auto;-moz-hypens:auto;hyphens:auto}ul{list-style:square}blockquote{margin-left:1em;padding-left:1em;border-left:1px solid #ddd}code{font-family:Consolas,Menlo,Monaco,monospace,serif}a{color:#2484c1}a:hover{text-decoration:underline}a img{border:0}hr{color:#ddd;height:1px;border-top:solid 1px #ddd;border-bottom:0;border-left:0;border-right:0}p#heart{font-size:2em;line-height:1;color:#ccc}.red{color:#b50000}body#index li{margin-bottom:1em}@media only screen and (max-device-width:1024px){body{font-size:120%;line-height:1.4}}@media only screen and (max-device-width:480px){body{text-align:left}article,footer{width:auto}article{padding:0 10px}}table tr{border-top:1px solid #ccc;background-color:#fff;margin:0}table tr:nth-child(2n){background-color:#aaa}table tr th{font-weight:700}table tr td:last-child,table tr th :last-child{margin-bottom:0}img{max-width:100%}code,tt{margin:0 2px;padding:0 5px;white-space:nowrap;border:1px solid #eaeaea;background-color:#f8f8f8;border-radius:3px}pre code{margin:0;white-space:pre;border:none;background:0 0}.highlight pre,pre{background-color:#f8f8f8;border:1px solid #ccc;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px;border-radius:3px}'
 
@@ -65,6 +67,9 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         # Restore Window geometry and state:
         settings = QtCore.QSettings("CMarkEd", "CMarkEd")
         geometry = settings.value("geometry")
+        editorFont = settings.value("editorFont")
+        if editorFont:
+            self.ui.sourceText.setFont(editorFont)
         if geometry:
             self.restoreGeometry(geometry)
         windowState = settings.value("windowState")
@@ -97,10 +102,60 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self.ui.sourceText.document().contentsChanged.connect(self.onDocumentWasModified)
         self.ui.action_Quit.triggered.connect(self.close)
         self.ui.action_Help_About.triggered.connect(self.open_help_about)
+        self.ui.action_Live_Preview.changed.connect(self.onLivePreview)
+        self.ui.action_Vertical_Layout.changed.connect(self.onVerticalLayout)
+        self.ui.action_Swap_Views.changed.connect(self.onSwapViews)
+        self.ui.action_Change_Editor_Font.triggered.connect(self.onChangeEditorFont)
+        self.ui.action_Export_as_PDF.triggered.connect(self.onExportAsPDF)
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
         self.ui.previewText.textChanged.connect(self.updateStatusBar)
+
+    def onLivePreview(self):
+        if self.ui.action_Live_Preview.isChecked():
+            self.ui.previewText.show()
+            self.sourceTextChanged()
+        else:
+            self.ui.previewText.hide()
+
+    def onVerticalLayout(self):
+        if self.ui.action_Vertical_Layout.isChecked():
+            self.ui.splitter.setOrientation(QtCore.Qt.Vertical)
+        else:
+            self.ui.splitter.setOrientation(QtCore.Qt.Horizontal)
+
+    def onSwapViews(self):
+        if self.ui.action_Live_Preview.isChecked():
+            sourceText = self.ui.splitter.widget(0)
+            self.ui.splitter.addWidget(sourceText)
+        else:
+            previewText = self.ui.splitter.widget(0)
+            self.ui.splitter.addWidget(previewText)
+
+    def onChangeEditorFont(self):
+        font, ok = QtGui.QFontDialog.getFont(self.ui.sourceText.font())
+        if ok:
+            settings = QtCore.QSettings("CMarkEd", "CMarkEd")
+            settings.setValue("editorFont", font)
+            self.ui.sourceText.setFont(font)
+
+    def onExportAsPDF(self):
+        try:
+            import weasyprint
+            from weasyprint import HTML
+            logger = weasyprint.LOGGER.warning = lambda *a, **kw: None
+
+            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self,
+                self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
+            if fileName:
+                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName)
+                QtGui.QApplication.restoreOverrideCursor()
+        except ImportError:
+            message = "You need to install 'weasyprint' in order to use this functionality."
+            QtGui.QMessageBox.warning(self, self.tr("Application"),
+                                      self.tr(message))
 
     def onSourceScrollChanged(self):
         if self.vPreviewScrollBar and self.vSourceScrollBar:
@@ -112,11 +167,12 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                 pass
 
     def sourceTextChanged(self):
-        preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
-        rendered = md2html(self.ui.sourceText.toPlainText())
-        self.ui.previewText.setHtml(rendered)
-        if preview_pos is not None:
-            self.vPreviewScrollBar.setValue(preview_pos)
+        if not self.ui.previewText.isHidden():
+            preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
+            rendered = md2html(self.ui.sourceText.toPlainText())
+            self.ui.previewText.setHtml(rendered)
+            if preview_pos is not None:
+                self.vPreviewScrollBar.setValue(preview_pos)
 
     def onDocumentWasModified(self):
         self.setWindowModified(self.ui.sourceText.document().isModified())
@@ -280,6 +336,12 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
     def open_help_about(self):
         self.help_about.exec_()
+
+    def onOpenCommonMarkTutorial(self):
+        webbrowser.open_new_tab("http://commonmark.org/help/tutorial/")
+
+    def onOpenCommonMarkReference(self):
+        webbrowser.open_new_tab("http://commonmark.org/help/")
 
 
 class HelpAbout(QtGui.QDialog):
