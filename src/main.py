@@ -54,6 +54,8 @@ def md2html(text):
 
 
 logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger('CMarkEd')
+log.setLevel(logging.INFO)
 
 __version__ = "0.4.0"
 
@@ -115,8 +117,10 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
         self.ui.action_Save.setDisabled(True)
 
-        self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
-        self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
+#        self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
+#        self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
+        self.vSourceScrollBar = None
+        self.vPreviewScrollBar = None
 
         # Set up the status bar:
         self.status_template = self.tr('Chars: {0}, Ln: {1}')
@@ -147,7 +151,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
-        self.ui.previewText.textChanged.connect(self.updateStatusBar)
+        #self.ui.previewText.textChanged.connect(self.updateStatusBar)
 
     def onLivePreview(self):
         if self.ui.action_Live_Preview.isChecked():
@@ -187,7 +191,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                 self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
             if fileName:
                 QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName)
+                HTML(md2html(self.ui.sourceText.toPlainText())).write_pdf(fileName)
                 QtWidgets.QApplication.restoreOverrideCursor()
         except ImportError:
             message = "You need to install 'weasyprint' in order to use this functionality."
@@ -207,7 +211,10 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         if not self.ui.previewText.isHidden():
             preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
             rendered = md2html(self.ui.sourceText.toPlainText())
-            self.ui.previewText.setHtml(rendered)
+            # Disable the web preview widget so it doesn't steal focus from the editor
+            self.ui.previewText.setEnabled(False)
+            self.ui.previewText.setHtml(rendered, QtCore.QUrl('file://' + self.workingFile))
+            self.ui.previewText.setEnabled(True)
             if preview_pos is not None:
                 self.vPreviewScrollBar.setValue(preview_pos)
 
@@ -294,9 +301,9 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                     workingDirectory = os.path.dirname(fileName)
                     os.chdir(workingDirectory)
 
-                    self.ui.sourceText.setPlainText(inf)
                     self.workingFile = fileName
                     self.workingDirectory = workingDirectory
+                    self.ui.sourceText.setPlainText(inf)
                     self.setWindowTitle(self.appTitle + " - {}[*]".format(fileName))
                     self.setWindowModified(False)
                     QtWidgets.QApplication.restoreOverrideCursor()
@@ -329,7 +336,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                             self.tr("Cannot open file: {}.").format(fileName))
                 else:
                     QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                    f.write(self.ui.previewText.toHtml())
+                    f.write(md2html(self.ui.sourceText.toPlainText()))
                     QtWidgets.QApplication.restoreOverrideCursor()
 
     def closeEvent(self, event):

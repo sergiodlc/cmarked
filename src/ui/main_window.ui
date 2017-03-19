@@ -28,11 +28,7 @@
        <enum>Qt::Horizontal</enum>
       </property>
       <widget class="QTextEdit" name="sourceText"/>
-      <widget class="QTextEdit" name="previewText">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <widget class="QWebEngineView" name="previewText" native="true"/>
      </widget>
     </item>
    </layout>
@@ -43,7 +39,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -243,6 +239,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header>qwebengineview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
@@ -336,22 +340,6 @@
     <hint type="sourcelabel">
      <x>347</x>
      <y>717</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>previewText</sender>
-   <signal>copyAvailable(bool)</signal>
-   <receiver>actionCopy</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1193</x>
-     <y>753</y>
     </hint>
     <hint type="destinationlabel">
      <x>-1</x>

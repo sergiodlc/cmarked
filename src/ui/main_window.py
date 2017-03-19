@@ -26,13 +26,12 @@ class Ui_MainWindow(object):
         self.splitter.setObjectName("splitter")
         self.sourceText = QtWidgets.QTextEdit(self.splitter)
         self.sourceText.setObjectName("sourceText")
-        self.previewText = QtWidgets.QTextEdit(self.splitter)
-        self.previewText.setReadOnly(True)
+        self.previewText = QtWebEngineWidgets.QWebEngineView(self.splitter)
         self.previewText.setObjectName("previewText")
         self.verticalLayout.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1475, 26))
         self.menubar.setObjectName("menubar")
         self.menu_File = QtWidgets.QMenu(self.menubar)
         self.menu_File.setObjectName("menu_File")
@@ -128,7 +127,6 @@ class Ui_MainWindow(object):
         self.sourceText.undoAvailable['bool'].connect(self.action_Undo.setEnabled)
         self.sourceText.redoAvailable['bool'].connect(self.actionRedo.setEnabled)
         self.sourceText.copyAvailable['bool'].connect(self.actionCopy.setEnabled)
-        self.previewText.copyAvailable['bool'].connect(self.actionCopy.setEnabled)
         self.actionCopy.triggered.connect(MainWindow.onCopy)
         self.actionCut.triggered.connect(self.sourceText.cut)
         self.sourceText.copyAvailable['bool'].connect(self.actionCut.setEnabled)
@@ -175,4 +173,5 @@ class Ui_MainWindow(object):
         self.actionCommonMark_Tutorial.setText(_translate("MainWindow", "CommonMark &Tutorial"))
         self.actionCommonMark_Reference.setText(_translate("MainWindow", "CommonMark &Reference"))
 
+from PyQt5 import QtWebEngineWidgets
 from . import resources_rc
