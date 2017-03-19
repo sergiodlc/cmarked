@@ -27,8 +27,22 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTextEdit" name="sourceText"/>
-      <widget class="QWebEngineView" name="previewText" native="true"/>
+      <widget class="QTextEdit" name="sourceText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>3</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+      <widget class="QWebEngineView" name="previewText" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
