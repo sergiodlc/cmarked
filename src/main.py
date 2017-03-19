@@ -16,7 +16,7 @@ from ctypes import CDLL, c_char_p, c_long
 import subprocess
 import types
 
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 try:
     from ui.main_window import Ui_MainWindow
@@ -72,8 +72,8 @@ def canInsertFromMimeData(self, source):
     if source.hasHtml():
         return True
     else:
-        return QtGui.QTextEdit.canInsertFromMimeData(self, source)
-        
+        return QtWidgets.QTextEdit.canInsertFromMimeData(self, source)
+
 def insertFromMimeData(self, source):
     if source.hasHtml():
         html = source.html()
@@ -88,10 +88,10 @@ def insertFromMimeData(self, source):
             cursor = self.textCursor()
             cursor.insertText(commonMark.decode("utf-8"))
     else:
-        QtGui.QTextEdit.insertFromMimeData(self, source) 
+        QtWidgets.QTextEdit.insertFromMimeData(self, source)
 
 
-class CMarkEdMainWindow(QtGui.QMainWindow):
+class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, parent=None):
         super(CMarkEdMainWindow, self).__init__(parent)
@@ -120,7 +120,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
 
         # Set up the status bar:
         self.status_template = self.tr('Chars: {0}, Ln: {1}')
-        self.statusLabel = QtGui.QLabel(self.status_template.format(0, 0))
+        self.statusLabel = QtWidgets.QLabel(self.status_template.format(0, 0))
         self.ui.statusbar.addPermanentWidget(self.statusLabel)
 
         self.connectSlots()
@@ -171,7 +171,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
             self.ui.splitter.addWidget(previewText)
 
     def onChangeEditorFont(self):
-        font, ok = QtGui.QFontDialog.getFont(self.ui.sourceText.font())
+        font, ok = QtWidgets.QFontDialog.getFont(self.ui.sourceText.font())
         if ok:
             settings = QtCore.QSettings("CMarkEd", "CMarkEd")
             settings.setValue("editorFont", font)
@@ -183,15 +183,15 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
             from weasyprint import HTML
             logger = weasyprint.LOGGER.warning = lambda *a, **kw: None
 
-            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self,
+            fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self,
                 self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
             if fileName:
-                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                 HTML(string=self.ui.previewText.toHtml()).write_pdf(fileName)
-                QtGui.QApplication.restoreOverrideCursor()
+                QtWidgets.QApplication.restoreOverrideCursor()
         except ImportError:
             message = "You need to install 'weasyprint' in order to use this functionality."
-            QtGui.QMessageBox.warning(self, self.tr("Application"),
+            QtWidgets.QMessageBox.warning(self, self.tr("Application"),
                                       self.tr(message))
 
     def onSourceScrollChanged(self):
@@ -220,24 +220,24 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         if self.workingFile:
             with self._opened_w_error(self.workingFile, 'w') as (f, err):
                 if err:
-                    QtGui.QMessageBox.warning(self, self.tr("Application"),
+                    QtWidgets.QMessageBox.warning(self, self.tr("Application"),
                             self.tr("Cannot open file: {}.").format(fileName))
                 else:
-                    QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                    QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                     f.write(self.ui.sourceText.toPlainText())
                     self.setWindowModified(False)
                     self.ui.action_Save.setDisabled(True)
-                    QtGui.QApplication.restoreOverrideCursor()
+                    QtWidgets.QApplication.restoreOverrideCursor()
         else:
-            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Save File"),
+            fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Save File"),
                 "new_common_mark", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
             if fileName:
                 with self._opened_w_error(fileName, 'w') as (f, err):
                     if err:
-                        QtGui.QMessageBox.warning(self, self.tr("Application"),
+                        QtWidgets.QMessageBox.warning(self, self.tr("Application"),
                                 self.tr("Cannot open file: {}.").format(fileName))
                     else:
-                        QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                         self.workingFile = fileName
                         workindDirectory = os.path.dirname(fileName)
                         os.chdir(workindDirectory)
@@ -246,60 +246,60 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                         self.setWindowTitle(self.appTitle + " - {}[*]".format(fileName))
                         self.setWindowModified(False);
                         self.ui.action_Save.setDisabled(True)
-                        QtGui.QApplication.restoreOverrideCursor()
+                        QtWidgets.QApplication.restoreOverrideCursor()
 
     def onSaveAs(self):
         if not self.workingFile :
             self.onSaveFile()
         else:
-            fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Save as"),
+            fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Save as"),
                     "", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
             if fileName:
                 with self._opened_w_error(fileName, 'w') as (f, err):
                     if err:
-                        QtGui.QMessageBox.warning(self, self.tr("Application"),
+                        QtWidgets.QMessageBox.warning(self, self.tr("Application"),
                                 self.tr("Cannot open file: {}.").format(fileName))
                     else:
-                        QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                         f.write(self.ui.sourceText.toPlainText())
                         if self.isWindowModified():
                             self.onSaveFile()
-                        QtGui.QApplication.restoreOverrideCursor()
+                        QtWidgets.QApplication.restoreOverrideCursor()
 
     def onOpenFile(self):
         type_of_files = "MarkDown files (*.md *.markdown);; HTML files (*.html);; All files(*.*)"
-        fileName, _ = QtGui.QFileDialog.getOpenFileName(self,
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,
                 self.tr("Open File"),
                 "", self.tr(type_of_files))
         if fileName:
             if fileName.endswith('.html'):
-                QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                 workingDirectory = os.path.dirname(fileName)
                 os.chdir(workingDirectory)
 
                 html_text = fromHTMLtoCommonMark(fileName)
-                
+
                 self.ui.sourceText.setText(html_text.decode('UTF-8'))
                 self.workingFile = fileName
                 self.workingDirectory = workingDirectory
                 self.setWindowTitle(self.appTitle + " - {}[*]".format(fileName))
                 self.setWindowModified(False)
-                QtGui.QApplication.restoreOverrideCursor()
+                QtWidgets.QApplication.restoreOverrideCursor()
 
             else:
                 with open(fileName, 'r', encoding='UTF-8') as f:
                     inf = f.read()
-                    QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                    
+                    QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+
                     workingDirectory = os.path.dirname(fileName)
                     os.chdir(workingDirectory)
-                    
+
                     self.ui.sourceText.setPlainText(inf)
                     self.workingFile = fileName
                     self.workingDirectory = workingDirectory
                     self.setWindowTitle(self.appTitle + " - {}[*]".format(fileName))
                     self.setWindowModified(False)
-                    QtGui.QApplication.restoreOverrideCursor()
+                    QtWidgets.QApplication.restoreOverrideCursor()
 
     def loadFile(self):
         """Open a file with commonmark data information when is passed by argument in sys.argv"""
@@ -320,32 +320,32 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
                     self.setWindowModified(False)
 
     def onExport(self):
-        fileName, filtr = QtGui.QFileDialog.getSaveFileName(self, self.tr("Export to"),
+        fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Export to"),
                 "", self.tr("HTML files (*.html)"))
         if fileName:
             with self._opened_w_error(fileName, 'w') as (f, err):
                 if err:
-                    QtGui.QMessageBox.warning(self, self.tr("Application"),
+                    QtWidgets.QMessageBox.warning(self, self.tr("Application"),
                             self.tr("Cannot open file: {}.").format(fileName))
                 else:
-                    QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                    QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
                     f.write(self.ui.previewText.toHtml())
-                    QtGui.QApplication.restoreOverrideCursor()
+                    QtWidgets.QApplication.restoreOverrideCursor()
 
     def closeEvent(self, event):
         if self.isWindowModified():
-            msgBox = QtGui.QMessageBox(self)
+            msgBox = QtWidgets.QMessageBox(self)
             msgBox.setWindowTitle(self.tr("Confirmation Message"))
             msgBox.setText(self.tr("The document has been modified."))
             msgBox.setInformativeText(self.tr("Do you want to save your changes?"))
-            msgBox.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
-            msgBox.setDefaultButton(QtGui.QMessageBox.Save)
+            msgBox.setStandardButtons(QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel)
+            msgBox.setDefaultButton(QtWidgets.QMessageBox.Save)
             ret = msgBox.exec_()
-            if ret == QtGui.QMessageBox.Cancel:
+            if ret == QtWidgets.QMessageBox.Cancel:
                 event.ignore()
                 msgBox.close()
                 return
-            if ret == QtGui.QMessageBox.Save:
+            if ret == QtWidgets.QMessageBox.Save:
                 self.onSaveFile()
         settings = QtCore.QSettings("CMarkEd", "CMarkEd")
         settings.setValue("geometry", self.saveGeometry())
@@ -353,7 +353,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         event.accept()
 
     def onCopy(self):
-        widget = QtGui.QApplication.instance().focusWidget()
+        widget = QtWidgets.QApplication.instance().focusWidget()
         if widget in (self.ui.sourceText, self.ui.previewText):
             widget.copy()
 
@@ -364,7 +364,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         self._filterSourceTextSelection(lambda text: text.lower())
 
     def onUpdatePasteMenuState(self):
-        mime_data = QtGui.QApplication.instance().clipboard().mimeData()
+        mime_data = QtWidgets.QApplication.instance().clipboard().mimeData()
         self.ui.actionPaste.setEnabled(mime_data and (mime_data.hasText() or mime_data.hasHtml()))
 
     @staticmethod
@@ -399,7 +399,7 @@ class CMarkEdMainWindow(QtGui.QMainWindow):
         webbrowser.open_new_tab("http://commonmark.org/help/")
 
 
-class HelpAbout(QtGui.QDialog):
+class HelpAbout(QtWidgets.QDialog):
     """UI to show information about CMarked project version, license, authors, etc."""
 
     def __init__(self, parent=None):
@@ -413,7 +413,7 @@ class HelpAbout(QtGui.QDialog):
 
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     myMainWindow = CMarkEdMainWindow()
     myMainWindow.show()
     sys.exit(app.exec_())
