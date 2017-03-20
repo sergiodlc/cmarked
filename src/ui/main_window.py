@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created: Thu Feb 23 20:13:48 2017
+# Created: Mon Mar  6 21:21:39 2017
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -75,12 +75,15 @@ class Ui_MainWindow(object):
         self.actionConvert_to_Uppercase.setObjectName("actionConvert_to_Uppercase")
         self.actionConvert_to_Lowercase = QtGui.QAction(MainWindow)
         self.actionConvert_to_Lowercase.setObjectName("actionConvert_to_Lowercase")
+        self.actionRun = QtGui.QAction(MainWindow)
+        self.actionRun.setObjectName("actionRun")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
         self.menu_File.addAction(self.action_Export)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
+        self.menu_File.addAction(self.actionRun)
         self.menuHelp.addAction(self.action_Help_About)
         self.menu_Edit.addAction(self.action_Undo)
         self.menu_Edit.addAction(self.actionRedo)
@@ -107,7 +110,7 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionPaste, QtCore.SIGNAL("triggered()"), self.sourceText.paste)
         QtCore.QObject.connect(self.actionConvert_to_Uppercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToUppercase)
         QtCore.QObject.connect(self.actionConvert_to_Lowercase, QtCore.SIGNAL("triggered()"), MainWindow.onConvertToLowercase)
-        QtCore.QObject.connect(self.menu_Edit, QtCore.SIGNAL("aboutToShow()"), MainWindow.onUpdatePasteMenuState)
+        QtCore.QObject.connect(self.actionRun, QtCore.SIGNAL("triggered()"), MainWindow.onRun)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -135,5 +138,7 @@ class Ui_MainWindow(object):
         self.actionPaste.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+V", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Uppercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Uppercase", None, QtGui.QApplication.UnicodeUTF8))
         self.actionConvert_to_Lowercase.setText(QtGui.QApplication.translate("MainWindow", "Convert to Lowercase", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRun.setText(QtGui.QApplication.translate("MainWindow", "Run", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionRun.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+R", None, QtGui.QApplication.UnicodeUTF8))
 
 from . import resources_rc
