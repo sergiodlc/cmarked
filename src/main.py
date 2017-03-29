@@ -16,7 +16,7 @@ from ctypes import CDLL, c_char_p, c_long
 import subprocess
 import types
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 
 try:
     from ui.main_window import Ui_MainWindow
@@ -111,6 +111,9 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         windowState = settings.value("windowState")
         if windowState:
             self.restoreState(windowState)
+
+        self.previewPage = LivePreviewPage()
+        self.ui.previewText.setPage(self.previewPage)
 
         self.ui.sourceText.canInsertFromMimeData = types.MethodType(canInsertFromMimeData, self.ui.sourceText)
         self.ui.sourceText.insertFromMimeData = types.MethodType(insertFromMimeData, self.ui.sourceText)
@@ -213,7 +216,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             rendered = md2html(self.ui.sourceText.toPlainText())
             # Disable the web preview widget so it doesn't steal focus from the editor
             self.ui.previewText.setEnabled(False)
-            self.ui.previewText.setHtml(rendered, QtCore.QUrl('file://' + self.workingFile))
+            self.previewPage.setHtml(rendered, QtCore.QUrl('file://' + self.workingFile))
             self.ui.previewText.setEnabled(True)
             if preview_pos is not None:
                 self.vPreviewScrollBar.setValue(preview_pos)
@@ -417,6 +420,14 @@ class HelpAbout(QtWidgets.QDialog):
 
     def addVersionNumber(self, version_number):
         self.ui.label_version.setText("CMarked: v{}.".format(version_number))
+
+
+class LivePreviewPage(QtWebEngineWidgets.QWebEnginePage):
+    def acceptNavigationRequest(self, url, nav_type, isMainFrame):
+        if nav_type == QtWebEngineWidgets.QWebEnginePage.NavigationTypeLinkClicked:
+            webbrowser.open_new_tab(url.toString())
+            return False
+        return True
 
 
 if __name__ == "__main__":
