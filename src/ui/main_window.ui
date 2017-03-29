@@ -53,7 +53,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -98,9 +98,15 @@
     <addaction name="separator"/>
     <addaction name="action_Change_Editor_Font"/>
    </widget>
+   <widget class="QMenu" name="menu_Styles">
+    <property name="title">
+     <string>&amp;Styles</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menuView"/>
+   <addaction name="menu_Styles"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

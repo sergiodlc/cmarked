@@ -15,6 +15,7 @@ from contextlib import contextmanager
 from ctypes import CDLL, c_char_p, c_long
 import subprocess
 import types
+import glob
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 
@@ -59,7 +60,6 @@ log.setLevel(logging.INFO)
 
 __version__ = "0.4.0"
 
-foghorn = '@import url(http://fonts.googleapis.com/css?family=Vollkorn:400,400italic,700,700italic&subset=latin);ol,ul{padding-left:1.2em}body,code,html{background:#fff}body,h1 a,h1 a:hover{color:#333}a,h1 a,h1 a:hover{text-decoration:none}hr,video{margin:2em 0}h1,h2,p#heart{text-align:center}table tr td,table tr th{border:1px solid #ccc;text-align:left;padding:6px 13px;margin:0}h1,p,table tr td :first-child,table tr th :first-child{margin-top:0}pre code,table,table tr{padding:0}body,html{padding:1em;margin:auto}body{font:1.3em Vollkorn,Palatino,Times;line-height:1;text-align:justify}h1,h2,h3{font-weight:400}h3,nav{font-style:italic}code,nav{font-size:.9em}article,footer,header,nav{margin:0 auto}article{margin-top:4em;margin-bottom:4em;min-height:400px}footer{margin-bottom:50px}video{border:1px solid #ddd}nav{border-bottom:1px solid #ddd;padding:1em 0}nav p{margin:0}p{-webkit-hypens:auto;-moz-hypens:auto;hyphens:auto}ul{list-style:square}blockquote{margin-left:1em;padding-left:1em;border-left:1px solid #ddd}code{font-family:Consolas,Menlo,Monaco,monospace,serif}a{color:#2484c1}a:hover{text-decoration:underline}a img{border:0}hr{color:#ddd;height:1px;border-top:solid 1px #ddd;border-bottom:0;border-left:0;border-right:0}p#heart{font-size:2em;line-height:1;color:#ccc}.red{color:#b50000}body#index li{margin-bottom:1em}@media only screen and (max-device-width:1024px){body{font-size:120%;line-height:1.4}}@media only screen and (max-device-width:480px){body{text-align:left}article,footer{width:auto}article{padding:0 10px}}table tr{border-top:1px solid #ccc;background-color:#fff;margin:0}table tr:nth-child(2n){background-color:#aaa}table tr th{font-weight:700}table tr td:last-child,table tr th :last-child{margin-bottom:0}img{max-width:100%}code,tt{margin:0 2px;padding:0 5px;white-space:nowrap;border:1px solid #eaeaea;background-color:#f8f8f8;border-radius:3px}pre code{margin:0;white-space:pre;border:none;background:0 0}.highlight pre,pre{background-color:#f8f8f8;border:1px solid #ccc;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px;border-radius:3px}'
 
 def fromHTMLtoCommonMark(file):
     try:
@@ -94,12 +94,23 @@ def insertFromMimeData(self, source):
 
 
 class CMarkEdMainWindow(QtWidgets.QMainWindow):
+    template = '''<html><head><link rel="stylesheet" href="{}"></head><body>{}</body></html>'''
 
     def __init__(self, parent=None):
         super(CMarkEdMainWindow, self).__init__(parent)
-        self.ui = Ui_MainWindow()
+        # Define some attributes:
+        self.vSourceScrollBar = None
+        self.vPreviewScrollBar = None
+        self.previewPage = LivePreviewPage()
+        self.appTitle = "CMarked"
+        self.setWindowTitle(self.appTitle + " - new_common_mark.md[*]")
+        self.workingFile = ""
+        self.workingDirectory = ""
+
+        self.ui = UiLayout()
         self.help_about = HelpAbout()
         self.ui.setupUi(self)
+
         # Restore Window geometry and state:
         settings = QtCore.QSettings("CMarkEd", "CMarkEd")
         geometry = settings.value("geometry")
@@ -112,7 +123,6 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         if windowState:
             self.restoreState(windowState)
 
-        self.previewPage = LivePreviewPage()
         self.ui.previewText.setPage(self.previewPage)
 
         self.ui.sourceText.canInsertFromMimeData = types.MethodType(canInsertFromMimeData, self.ui.sourceText)
@@ -122,8 +132,6 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
 #        self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
 #        self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
-        self.vSourceScrollBar = None
-        self.vPreviewScrollBar = None
 
         # Set up the status bar:
         self.status_template = self.tr('Chars: {0}, Ln: {1}')
@@ -131,10 +139,6 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         self.ui.statusbar.addPermanentWidget(self.statusLabel)
 
         self.connectSlots()
-        self.appTitle = "CMarked"
-        self.setWindowTitle(self.appTitle + " - new_common_mark.md[*]")
-        self.workingFile = ""
-        self.workingDirectory = ""
         #self.ui.previewText.setDefaultStyleSheet(foghorn)
         self.loadFile()
 
@@ -216,7 +220,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             rendered = md2html(self.ui.sourceText.toPlainText())
             # Disable the web preview widget so it doesn't steal focus from the editor
             self.ui.previewText.setEnabled(False)
-            self.previewPage.setHtml(rendered, QtCore.QUrl('file://' + self.workingFile))
+            self.previewPage.setHtml(self.template.format(self.style, rendered), QtCore.QUrl('file://' + self.workingFile))
             self.ui.previewText.setEnabled(True)
             if preview_pos is not None:
                 self.vPreviewScrollBar.setValue(preview_pos)
@@ -342,6 +346,16 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                     f.write(md2html(self.ui.sourceText.toPlainText()))
                     QtWidgets.QApplication.restoreOverrideCursor()
 
+    def onStyleChanged(self):
+        if not self.ui.styles_dir:
+            return
+        style_action = self.ui.style_actions.checkedAction()
+        self.style = os.path.join(self.ui.styles_dir, style_action.objectName() + ".css")
+        log.info("Style changed to " + self.style)
+        self.ui.sourceText.textChanged.emit()
+
+
+
     def closeEvent(self, event):
         if self.isWindowModified():
             msgBox = QtWidgets.QMessageBox(self)
@@ -360,6 +374,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         settings = QtCore.QSettings("CMarkEd", "CMarkEd")
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("windowState", self.saveState())
+        settings.setValue("lastStyle", self.ui.style_actions.checkedAction().objectName())
         event.accept()
 
     def onCopy(self):
@@ -429,6 +444,51 @@ class LivePreviewPage(QtWebEngineWidgets.QWebEnginePage):
             return False
         return True
 
+class UiLayout(Ui_MainWindow):
+    def __init__(self):
+        self.style_actions = None
+
+    def setupUi(self, MainWindow):
+        super(UiLayout, self).setupUi(MainWindow)
+        # Dynamically load the stylesheets:
+        system_styles_dir = os.path.join(sys.prefix, 'share', 'cmarked', 'styles')
+        local_styles_dir = os.path.realpath(os.path.join(__file__, os.pardir, os.pardir, 'styles'))
+        print("system_styles_dir =", system_styles_dir)
+        print("local_styles_dir =", local_styles_dir)
+
+        self.styles_dir = system_styles_dir if os.path.isdir(system_styles_dir) else local_styles_dir if os.path.isdir(local_styles_dir) else None
+
+        self.style_actions = QtWidgets.QActionGroup(MainWindow)
+        self.style_actions.triggered.connect(MainWindow.onStyleChanged)
+
+        if self.styles_dir:
+            for style_file in sorted(glob.glob(os.path.join(self.styles_dir, '*.css'))):
+                style_name = os.path.basename(style_file)
+                menu_name = style_name[0:-4].replace("_", " ").title()
+                action = QtWidgets.QAction(MainWindow)
+                action.setObjectName(style_name[0:-4])
+                action.setCheckable(True)
+                self.menu_Styles.addAction(action)
+                self.style_actions.addAction(action)
+
+        # Restore the last style:
+        settings = QtCore.QSettings("CMarkEd", "CMarkEd")
+        lastStyle = settings.value("lastStyle")
+        if lastStyle and os.path.isfile(os.path.join(self.styles_dir, lastStyle + '.css')):
+            last_action = MainWindow.findChild(QtWidgets.QAction, lastStyle)
+        else:
+            last_action = MainWindow.findChild(QtWidgets.QAction, "github")
+        if last_action:
+            last_action.setChecked(True)
+            self.style_actions.triggered.emit(last_action)
+
+        self.retranslateUi(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        super(UiLayout, self).retranslateUi(MainWindow)
+        if self.style_actions:
+            for action in self.style_actions.actions():
+                action.setText(MainWindow.tr(action.objectName().replace("_", " ").title()))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
