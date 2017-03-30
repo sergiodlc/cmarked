@@ -1,5 +1,5 @@
-from PySide import QtCore, QtGui
-from PySide.QtCore import Qt
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtCore import Qt
 
 # Default format definitions:
 

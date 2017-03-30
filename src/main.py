@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import platform
 import logging
 import os
 import logging
@@ -15,13 +16,13 @@ import glob
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 
 try:
-    from .ui.main_window import Ui_MainWindow
-    from .ui.about_cmarked import Ui_Dialog as Ui_Help_About
+    from ui.main_window import Ui_MainWindow
+    from ui.about_cmarked import Ui_Dialog as Ui_Help_About
 except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
 
-from . import cmark
+from cmark import CommonMarkHighlighter, markdown_to_html, highlightDocument
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -65,7 +66,7 @@ def insertFromMimeData(self, source):
 
 class CMarkEdMainWindow(QtWidgets.QMainWindow):
     template = '''<html><head><link rel="stylesheet" href="{}"></head><body>{}</body></html>'''
-    ast_ready = QtCore.Signal()
+    ast_ready = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(CMarkEdMainWindow, self).__init__(parent)
@@ -99,7 +100,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
         self.ui.sourceText.canInsertFromMimeData = types.MethodType(canInsertFromMimeData, self.ui.sourceText)
         self.ui.sourceText.insertFromMimeData = types.MethodType(insertFromMimeData, self.ui.sourceText)
-        self.highlighter = cmark.CommonMarkHighlighter(self.ui.sourceText)
+        self.highlighter = CommonMarkHighlighter(self.ui.sourceText)
 
         self.ui.action_Save.setDisabled(True)
 
@@ -191,7 +192,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
     def sourceTextChanged(self):
         if not self.ui.previewText.isHidden():
             preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
-            rendered, self.ast = cmark.markdown_to_html(self.ui.sourceText.toPlainText())
+            rendered, self.ast = markdown_to_html(self.ui.sourceText.toPlainText())
             # Disable the web preview widget so it doesn't steal focus from the editor
             self.ui.previewText.setEnabled(False)
             self.previewPage.setHtml(self.template.format(self.style, rendered), QtCore.QUrl('file://' + self.workingFile))
@@ -201,7 +202,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
     def applySyntaxHighlight(self):
         doc = self.ui.sourceText.document()
-        cmark.highlightDocument(doc, self.ast)
+        highlightDocument(doc, self.ast)
 #        block = doc.begin()
 #        node_seq = cmark.iterBlockNodes(self.ast)
 #        node, node_start, node_end = next(node_seq)

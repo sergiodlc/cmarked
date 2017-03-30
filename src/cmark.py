@@ -9,9 +9,9 @@ from ctypes import *
 import sys
 import platform
 
-from PySide import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 
-from .styles import editorStyles
+from styles import editorStyles
 
 default_style = editorStyles['default']
 
