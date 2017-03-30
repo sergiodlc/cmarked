@@ -67,6 +67,7 @@
     <addaction name="action_Export_as_PDF"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
+    <addaction name="actionRun"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -256,6 +257,14 @@
   <action name="actionCommonMark_Reference">
    <property name="text">
     <string>CommonMark &amp;Reference</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="text">
+    <string>Run</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
@@ -464,14 +473,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>menu_Edit</sender>
-   <signal>aboutToShow()</signal>
+   <sender>actionRun</sender>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>onUpdatePasteMenuState()</slot>
+   <slot>onRun()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>134</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>
@@ -521,5 +530,6 @@
   <slot>onOpenCommonMarkTutorial()</slot>
   <slot>onOpenCommonMarkReference()</slot>
   <slot>onPasteHTMLFromClipBoard()</slot>
+  <slot>onRun()</slot>
  </slots>
 </ui>

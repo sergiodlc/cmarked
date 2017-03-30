@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Example for using the shared library from python
-# Will work with either python 2 or python 3
-# Requires cmark library to be installed
-
 import sys
-import platform
 import logging
 import os
 import logging
@@ -20,38 +15,13 @@ import glob
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 
 try:
-    from ui.main_window import Ui_MainWindow
-    from ui.about_cmarked import Ui_Dialog as Ui_Help_About
+    from .ui.main_window import Ui_MainWindow
+    from .ui.about_cmarked import Ui_Dialog as Ui_Help_About
 except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
 
-
-sysname = platform.system()
-
-if sysname == 'Darwin':
-    libname = "libcmark.dylib"
-elif sysname == 'Windows':
-    libname = "cmark.dll"
-else:
-    libname = "libcmark.so"
-cmark = CDLL(libname)
-
-markdown = cmark.cmark_markdown_to_html
-markdown.restype = c_char_p
-markdown.argtypes = [c_char_p, c_long, c_long]
-
-opts = 0 # defaults
-
-def md2html(text):
-    if sys.version_info >= (3,0):
-        textbytes = text.encode('utf-8')
-        textlen = len(textbytes)
-        return markdown(textbytes, textlen, opts).decode('utf-8')
-    else:
-        textbytes = text
-        textlen = len(text)
-        return markdown(textbytes, textlen, opts)
+from . import cmark
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -95,6 +65,7 @@ def insertFromMimeData(self, source):
 
 class CMarkEdMainWindow(QtWidgets.QMainWindow):
     template = '''<html><head><link rel="stylesheet" href="{}"></head><body>{}</body></html>'''
+    ast_ready = QtCore.Signal()
 
     def __init__(self, parent=None):
         super(CMarkEdMainWindow, self).__init__(parent)
@@ -111,6 +82,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         self.help_about = HelpAbout()
         self.ui.setupUi(self)
 
+        self.ast = None
         # Restore Window geometry and state:
         settings = QtCore.QSettings("CMarkEd", "CMarkEd")
         geometry = settings.value("geometry")
@@ -127,6 +99,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
         self.ui.sourceText.canInsertFromMimeData = types.MethodType(canInsertFromMimeData, self.ui.sourceText)
         self.ui.sourceText.insertFromMimeData = types.MethodType(insertFromMimeData, self.ui.sourceText)
+        self.highlighter = cmark.CommonMarkHighlighter(self.ui.sourceText)
 
         self.ui.action_Save.setDisabled(True)
 
@@ -159,6 +132,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
         #self.ui.previewText.textChanged.connect(self.updateStatusBar)
+        self.ast_ready.connect(self.applySyntaxHighlight)
 
     def onLivePreview(self):
         if self.ui.action_Live_Preview.isChecked():
@@ -217,13 +191,30 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
     def sourceTextChanged(self):
         if not self.ui.previewText.isHidden():
             preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
-            rendered = md2html(self.ui.sourceText.toPlainText())
+            rendered, self.ast = cmark.markdown_to_html(self.ui.sourceText.toPlainText())
             # Disable the web preview widget so it doesn't steal focus from the editor
             self.ui.previewText.setEnabled(False)
             self.previewPage.setHtml(self.template.format(self.style, rendered), QtCore.QUrl('file://' + self.workingFile))
             self.ui.previewText.setEnabled(True)
             if preview_pos is not None:
                 self.vPreviewScrollBar.setValue(preview_pos)
+
+    def applySyntaxHighlight(self):
+        doc = self.ui.sourceText.document()
+        cmark.highlightDocument(doc, self.ast)
+#        block = doc.begin()
+#        node_seq = cmark.iterBlockNodes(self.ast)
+#        node, node_start, node_end = next(node_seq)
+#        while block != doc.end():
+#            #print("Block", block.blockNumber(), "Pos:", block.position(), "Cont:", block.text())
+#            ln = block.blockNumber() + 1
+#            if node and not (node_start <= ln <= node_end):
+#                node, node_start, node_end = next(node_seq)
+#            if node and node_start <= ln <= node_end:
+#                #cmark.highlightBlock(block, node)
+#                block.setUserData(ASTUserData(node))
+#            block = block.next()
+#        self.highlighter.rehighlight()
 
     def onDocumentWasModified(self):
         self.setWindowModified(self.ui.sourceText.document().isModified())
@@ -244,7 +235,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QApplication.restoreOverrideCursor()
         else:
             fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Save File"),
-                "new_common_mark", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
+                "new_common_mark", self.tr("MarkDown files (*.md *.markdown);; All files(*)"))
             if fileName:
                 with self._opened_w_error(fileName, 'w') as (f, err):
                     if err:
@@ -267,7 +258,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             self.onSaveFile()
         else:
             fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self, self.tr("Save as"),
-                    "", self.tr("MarkDown files (*.md *.markdown);; All files(*.*)"))
+                    "", self.tr("MarkDown files (*.md *.markdown);; All files(*)"))
             if fileName:
                 with self._opened_w_error(fileName, 'w') as (f, err):
                     if err:
@@ -281,7 +272,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                         QtWidgets.QApplication.restoreOverrideCursor()
 
     def onOpenFile(self):
-        type_of_files = "MarkDown files (*.md *.markdown);; HTML files (*.html);; All files(*.*)"
+        type_of_files = "MarkDown files (*.md *.markdown);; HTML files (*.html);; All files(*)"
         fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,
                 self.tr("Open File"),
                 "", self.tr(type_of_files))
@@ -392,6 +383,14 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         mime_data = QtWidgets.QApplication.instance().clipboard().mimeData()
         self.ui.actionPaste.setEnabled(mime_data and (mime_data.hasText() or mime_data.hasHtml()))
 
+    def onRun(self):
+        self.ast_ready.emit()
+#        doc = self.ui.sourceText.document()
+#        block = doc.begin()
+#        while block != doc.end():
+#            print("Block", block.blockNumber(), "Pos:", block.position(), "Cont:", block.text())
+#            block = block.next()
+
     @staticmethod
     @contextmanager
     def _opened_w_error(filename, mode, encoding="UTF-8"):
@@ -489,6 +488,17 @@ class UiLayout(Ui_MainWindow):
         if self.style_actions:
             for action in self.style_actions.actions():
                 action.setText(MainWindow.tr(action.objectName().replace("_", " ").title()))
+
+
+
+
+class ASTUserData(QtGui.QTextBlockUserData):
+    def __init__(self, node):
+        self.node = node
+        super(ASTUserData, self).__init__()
+
+
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

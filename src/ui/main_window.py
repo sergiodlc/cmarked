@@ -105,6 +105,8 @@ class Ui_MainWindow(object):
         self.actionCommonMark_Tutorial.setObjectName("actionCommonMark_Tutorial")
         self.actionCommonMark_Reference = QtWidgets.QAction(MainWindow)
         self.actionCommonMark_Reference.setObjectName("actionCommonMark_Reference")
+        self.actionRun = QtWidgets.QAction(MainWindow)
+        self.actionRun.setObjectName("actionRun")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
@@ -112,6 +114,7 @@ class Ui_MainWindow(object):
         self.menu_File.addAction(self.action_Export_as_PDF)
         self.menu_File.addSeparator()
         self.menu_File.addAction(self.action_Quit)
+        self.menu_File.addAction(self.actionRun)
         self.menuHelp.addAction(self.actionCommonMark_Tutorial)
         self.menuHelp.addAction(self.actionCommonMark_Reference)
         self.menuHelp.addAction(self.action_Help_About)
@@ -146,7 +149,7 @@ class Ui_MainWindow(object):
         self.actionPaste.triggered.connect(self.sourceText.paste)
         self.actionConvert_to_Uppercase.triggered.connect(MainWindow.onConvertToUppercase)
         self.actionConvert_to_Lowercase.triggered.connect(MainWindow.onConvertToLowercase)
-        self.menu_Edit.aboutToShow.connect(MainWindow.onUpdatePasteMenuState)
+        self.actionRun.triggered.connect(MainWindow.onRun)
         self.actionCommonMark_Tutorial.triggered.connect(MainWindow.onOpenCommonMarkTutorial)
         self.actionCommonMark_Reference.triggered.connect(MainWindow.onOpenCommonMarkReference)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -186,6 +189,8 @@ class Ui_MainWindow(object):
         self.action_Export_as_PDF.setText(_translate("MainWindow", "Export as PDF"))
         self.actionCommonMark_Tutorial.setText(_translate("MainWindow", "CommonMark &Tutorial"))
         self.actionCommonMark_Reference.setText(_translate("MainWindow", "CommonMark &Reference"))
+        self.actionRun.setText(_translate("MainWindow", "Run"))
+        self.actionRun.setShortcut(_translate("MainWindow", "Ctrl+R"))
 
 from PyQt5 import QtWebEngineWidgets
 from . import resources_rc
