@@ -198,12 +198,12 @@ def markdown_to_html(text):
     if sys.version_info >= (3,0):
         textbytes = text.encode('utf-8')
         textlen = len(textbytes)
-        res, ast = md2html(textbytes, textlen, opts)
+        res, ast = md2html(textbytes, textlen, 2)  # 2 => Add sourcepos
         return res.decode('utf-8'), ast
     else:
         textbytes = text
         textlen = len(text)
-        return md2html(textbytes, textlen, opts)
+        return md2html(textbytes, textlen, 2)
 
 def print_node(node, prefix=''):
     print(prefix + "Literal:", node_get_literal(node))
@@ -234,16 +234,25 @@ def traverse(text):
 def iterBlockNodes(ast):
     it = iter_new(ast)
     ev_type = iter_next(it)
-    blocks = (b"heading", b"paragraph")  # TODO: Add a complete list of block elements
+    blocks = (b"heading", b"paragraph", b"block_quote", b"thematic_break", b"item")
     while ev_type != CMARK_EVENT_DONE:
         node = iter_get_node(it)
         #print("iterating over", (ev_type, node_get_type_string(node)))
         if ev_type == CMARK_EVENT_ENTER and node_get_type_string(node) in blocks:  # CMARK_EVENT_ENTER and is a block
             #print("yielding", (node, node.contents.start_line, node.contents.end_line))
-            yield (node, node.contents.start_line, node.contents.end_line)
+            yield (node, node.contents.start_line, node.contents.start_column, node.contents.end_line, node.contents.end_column)
         ev_type = iter_next(it)
     iter_free(it)
-    yield (None, 0, 1e20)
+    yield (None, 0, 0, 1e20, 0)
+
+
+def nearestSourcePos(ast, ln):
+    for node, sl, sc, el, ec in iterBlockNodes(ast):
+        if node and sl >= ln:
+            return "%d:%d-%d:%d" % (sl, sc, el, ec)
+    return None
+
+
 
 def iterSubTree(pnode):
     it = iter_new(pnode)

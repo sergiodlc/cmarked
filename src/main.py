@@ -22,7 +22,7 @@ except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
 
-from cmark import CommonMarkHighlighter, markdown_to_html, highlightDocument
+from cmark import CommonMarkHighlighter, markdown_to_html, highlightDocument, nearestSourcePos
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -32,10 +32,10 @@ log.setLevel(logging.INFO)
 __version__ = "0.4.0"
 
 
-def fromHTMLtoCommonMark(file):
+def fromHTMLtoCommonMark(html_file):
     try:
         commonMark = subprocess.check_output(["pandoc",
-                                           file, "-f", "html", "-t",
+                                           html_file, "-f", "html", "-t",
                                            "commonmark"])
         return commonMark
     except subprocess.CalledProcessError as error:
@@ -45,7 +45,7 @@ def canInsertFromMimeData(self, source):
     if source.hasHtml():
         return True
     else:
-        return QtWidgets.QTextEdit.canInsertFromMimeData(self, source)
+        return QtWidgets.QPlainTextEdit.canInsertFromMimeData(self, source)
 
 def insertFromMimeData(self, source):
     if source.hasHtml():
@@ -56,25 +56,28 @@ def insertFromMimeData(self, source):
             file.write(html)
 
         commonMark = fromHTMLtoCommonMark(temp_file)
-        os.remove(temp_file)
+        print(commonMark.decode("utf-8"))
         if commonMark:
-            cursor = self.textCursor()
-            cursor.insertText(commonMark.decode("utf-8"))
+            self.insertPlainText(commonMark.decode("utf-8"))
+            #cursor = self.textCursor()
+            #cursor.insertText(commonMark.decode("utf-8"))
+        os.remove(temp_file)
     else:
-        QtWidgets.QTextEdit.insertFromMimeData(self, source)
+        QtWidgets.QPlainTextEdit.insertFromMimeData(self, source)
 
 
 class CMarkEdMainWindow(QtWidgets.QMainWindow):
     template = '''<html><head><link rel="stylesheet" href="{}"></head><body>{}</body></html>'''
     ast_ready = QtCore.pyqtSignal()
+    #request_scroll_adjust = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(CMarkEdMainWindow, self).__init__(parent)
         # Define some attributes:
         self.vSourceScrollBar = None
         self.vPreviewScrollBar = None
-        self.previewPage = LivePreviewPage()
-        self.appTitle = "CMarked"
+        self.previewPage = LivePreviewPage(self)
+        self.appTitle = "CMarkEd"
         self.setWindowTitle(self.appTitle + " - new_common_mark.md[*]")
         self.workingFile = ""
         self.workingDirectory = ""
@@ -98,13 +101,14 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
         self.ui.previewText.setPage(self.previewPage)
 
+        self.ui.sourceText.setCenterOnScroll(True)
         self.ui.sourceText.canInsertFromMimeData = types.MethodType(canInsertFromMimeData, self.ui.sourceText)
         self.ui.sourceText.insertFromMimeData = types.MethodType(insertFromMimeData, self.ui.sourceText)
         self.highlighter = CommonMarkHighlighter(self.ui.sourceText)
 
         self.ui.action_Save.setDisabled(True)
 
-#        self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
+        self.vSourceScrollBar = self.ui.sourceText.verticalScrollBar()
 #        self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
 
         # Set up the status bar:
@@ -132,8 +136,11 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         # Experimenting with scrolling:
         if self.vSourceScrollBar:
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
+        # self.previewPage.loadFinished.connect(self.onSourceScrollChanged)
+        #self.request_scroll_adjust.connect(self.onSourceScrollChanged)
         #self.ui.previewText.textChanged.connect(self.updateStatusBar)
         self.ast_ready.connect(self.applySyntaxHighlight)
+        #self.ui.previewText.renderProcessTerminated.connect(self.previewPage.renderProcessTerminated)
 
     def onLivePreview(self):
         if self.ui.action_Live_Preview.isChecked():
@@ -180,25 +187,41 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, self.tr("Application"),
                                       self.tr(message))
 
+    #@QtCore.pyqtSlot(int)
     def onSourceScrollChanged(self):
-        if self.vPreviewScrollBar and self.vSourceScrollBar:
-            smin, spos, smax = self.vSourceScrollBar.minimum(), self.vSourceScrollBar.value(), self.vSourceScrollBar.maximum()
-            tmin, tmax = self.vPreviewScrollBar.minimum(), self.vPreviewScrollBar.maximum()
-            try:
-                self.vPreviewScrollBar.setValue(((spos - smin) / (smax - smin)) * (tmax - tmin) + tmin)
-            except ZeroDivisionError:
-                pass
+        if self.vSourceScrollBar and self.ast:
+            print("pasa")
+            block = self.ui.sourceText.firstVisibleBlock()
+            if block:
+                ln = block.blockNumber()
+                sp = nearestSourcePos(self.ast, ln)
+                if sp:
+                    self.previewPage.runJavaScript('''document.querySelector('p[data-sourcepos="%s"]').scrollIntoView();''' % sp)
+
+    def onSourceCursorPositionChanged(self):
+        log.info("Cursor position changed")
+        # cl = self.ui.sourceText.textCursor().blockNumber()
+        # smin, spos, smax = self.vSourceScrollBar.minimum(), self.vSourceScrollBar.value(), self.vSourceScrollBar.maximum()
+        # try:
+        #     nlines = self.ui.sourceText.document().blockCount()
+        #     ln = int(nlines*((spos - smin) / (smax - smin)))
+        #     #log.info("Estimated line: %d", ln)
+        #     sp = nearestSourcePos(self.ast, ln)
+        #     log.info("Cursor at line %d of %d. Scroll at line %d. Sourcepos = '%s'", cl, nlines, ln, sp)
+        #
+        # except ZeroDivisionError:
+        #     pass
+
 
     def sourceTextChanged(self):
         if not self.ui.previewText.isHidden():
-            preview_pos = self.vPreviewScrollBar.value() if self.vPreviewScrollBar else None
             rendered, self.ast = markdown_to_html(self.ui.sourceText.toPlainText())
+            #print(rendered)
             # Disable the web preview widget so it doesn't steal focus from the editor
             self.ui.previewText.setEnabled(False)
             self.previewPage.setHtml(self.template.format(self.style, rendered), QtCore.QUrl('file://' + self.workingFile))
             self.ui.previewText.setEnabled(True)
-            if preview_pos is not None:
-                self.vPreviewScrollBar.setValue(preview_pos)
+            #self.onSourceScrollChanged()
 
     def applySyntaxHighlight(self):
         doc = self.ui.sourceText.document()
@@ -386,6 +409,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 
     def onRun(self):
         self.ast_ready.emit()
+        self.previewPage.runJavaScript('''document.querySelector('p[data-sourcepos="1161:1-1161:43"]').scrollIntoView();''')
 #        doc = self.ui.sourceText.document()
 #        block = doc.begin()
 #        while block != doc.end():
@@ -421,7 +445,11 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         webbrowser.open_new_tab("http://commonmark.org/help/tutorial/")
 
     def onOpenCommonMarkReference(self):
-        webbrowser.open_new_tab("http://commonmark.org/help/")
+        p = self.previewPage.scrollPosition()
+        log.info("Scroll position: (%f, %f)", p.x(), p.y())
+        #webbrowser.open_new_tab("http://commonmark.org/help/")
+
+
 
 
 class HelpAbout(QtWidgets.QDialog):
@@ -437,12 +465,31 @@ class HelpAbout(QtWidgets.QDialog):
         self.ui.label_version.setText("CMarked: v{}.".format(version_number))
 
 
+
+
 class LivePreviewPage(QtWebEngineWidgets.QWebEnginePage):
+    def __init__(self, parent):
+        super(LivePreviewPage, self).__init__()
+        self.parent = parent
+        self.loadFinished.connect(self.pageLoaded)
+        #self.renderProcessTerminated.connect(self.pageRendered)
+
     def acceptNavigationRequest(self, url, nav_type, isMainFrame):
         if nav_type == QtWebEngineWidgets.QWebEnginePage.NavigationTypeLinkClicked:
             webbrowser.open_new_tab(url.toString())
             return False
         return True
+
+    @QtCore.pyqtSlot('QWebEnginePage::RenderProcessTerminationStatus', int)
+    def pageRendered(self, terminationStatus, exitCode):
+        if terminationStatus == QtWebEngineWidgets.QWebEnginePage.NormalTerminationStatus:
+            self.parent.onSourceScrollChanged()
+
+    @QtCore.pyqtSlot(bool)
+    def pageLoaded(self, ok):
+        self.parent.onSourceScrollChanged()
+
+
 
 class UiLayout(Ui_MainWindow):
     def __init__(self):
@@ -504,6 +551,7 @@ class ASTUserData(QtGui.QTextBlockUserData):
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     myMainWindow = CMarkEdMainWindow()
+    myMainWindow.setWindowTitle(myMainWindow.appTitle + " - new_common_mark.md[*]")
     myMainWindow.show()
     sys.exit(app.exec_())
 
