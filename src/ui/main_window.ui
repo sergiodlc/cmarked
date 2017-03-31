@@ -27,10 +27,20 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QTextEdit" name="sourceText"/>
-      <widget class="QTextEdit" name="previewText">
-       <property name="readOnly">
-        <bool>true</bool>
+      <widget class="QPlainTextEdit" name="sourceText">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>3</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+      <widget class="QWebEngineView" name="previewText" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
        </property>
       </widget>
      </widget>
@@ -57,6 +67,7 @@
     <addaction name="action_Export_as_PDF"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
+    <addaction name="actionRun"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -88,9 +99,15 @@
     <addaction name="separator"/>
     <addaction name="action_Change_Editor_Font"/>
    </widget>
+   <widget class="QMenu" name="menu_Styles">
+    <property name="title">
+     <string>&amp;Styles</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menuView"/>
+   <addaction name="menu_Styles"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -242,123 +259,27 @@
     <string>CommonMark &amp;Reference</string>
    </property>
   </action>
+  <action name="actionRun">
+   <property name="text">
+    <string>Run</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header>qwebengineview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
  <connections>
-  <connection>
-   <sender>sourceText</sender>
-   <signal>textChanged()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>sourceTextChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>626</x>
-     <y>318</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>800</x>
-     <y>951</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>action_Undo</sender>
-   <signal>triggered()</signal>
-   <receiver>sourceText</receiver>
-   <slot>undo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>371</x>
-     <y>490</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionRedo</sender>
-   <signal>triggered()</signal>
-   <receiver>sourceText</receiver>
-   <slot>redo()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>371</x>
-     <y>490</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sourceText</sender>
-   <signal>undoAvailable(bool)</signal>
-   <receiver>action_Undo</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>371</x>
-     <y>490</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sourceText</sender>
-   <signal>redoAvailable(bool)</signal>
-   <receiver>actionRedo</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>371</x>
-     <y>490</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sourceText</sender>
-   <signal>copyAvailable(bool)</signal>
-   <receiver>actionCopy</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>347</x>
-     <y>717</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>previewText</sender>
-   <signal>copyAvailable(bool)</signal>
-   <receiver>actionCopy</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>1193</x>
-     <y>753</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>actionCopy</sender>
    <signal>triggered()</signal>
@@ -372,54 +293,6 @@
     <hint type="destinationlabel">
      <x>737</x>
      <y>489</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionCut</sender>
-   <signal>triggered()</signal>
-   <receiver>sourceText</receiver>
-   <slot>cut()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>371</x>
-     <y>490</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sourceText</sender>
-   <signal>copyAvailable(bool)</signal>
-   <receiver>actionCut</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>371</x>
-     <y>490</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionPaste</sender>
-   <signal>triggered()</signal>
-   <receiver>sourceText</receiver>
-   <slot>paste()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>371</x>
-     <y>491</y>
     </hint>
    </hints>
   </connection>
@@ -456,14 +329,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>menu_Edit</sender>
-   <signal>aboutToShow()</signal>
+   <sender>actionRun</sender>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>onUpdatePasteMenuState()</slot>
+   <slot>onRun()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>134</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>737</x>
@@ -503,6 +376,70 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>textChanged()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>sourceTextChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>515</x>
+     <y>571</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>678</x>
+     <y>954</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>cursorPositionChanged()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onSourceCursorPositionChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1133</x>
+     <y>753</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1237</x>
+     <y>950</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>copyAvailable(bool)</signal>
+   <receiver>actionCopy</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>718</x>
+     <y>489</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sourceText</sender>
+   <signal>undoAvailable(bool)</signal>
+   <receiver>action_Undo</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>718</x>
+     <y>489</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>sourceTextChanged()</slot>
@@ -513,5 +450,7 @@
   <slot>onOpenCommonMarkTutorial()</slot>
   <slot>onOpenCommonMarkReference()</slot>
   <slot>onPasteHTMLFromClipBoard()</slot>
+  <slot>onRun()</slot>
+  <slot>onSourceCursorPositionChanged()</slot>
  </slots>
 </ui>

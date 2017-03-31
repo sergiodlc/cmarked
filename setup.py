@@ -45,6 +45,17 @@ SETUP = {
     ],
 }
 
+# Find files matching patterns
+def find_files(directory, patterns):
+    """ Recursively find all files in a folder tree """
+    for root, dirs, files in os.walk(directory):
+        for basename in files:
+            if ".pyc" not in basename and "__pycache__" not in basename:
+                for pattern in patterns:
+                    if fnmatch.fnmatch(basename, pattern):
+                        filename = os.path.join(root, basename)
+                        yield filename
+
 # Boolean: running as root?
 ROOT = os.geteuid() == 0
 # For Debian packaging it could be a fakeroot so reset flag to prevent execution of
@@ -59,18 +70,9 @@ os_files = [
     ('share/applications', ['xdg/cmarked.desktop']),
     # XDG application icon
     ('share/pixmaps', ['xdg/cmarked.svg']),
+    # Stylesheets for live preview
+    ('share/cmarked/styles', [style for style in find_files('styles', '*.css')])
 ]
-
-# Find files matching patterns
-def find_files(directory, patterns):
-    """ Recursively find all files in a folder tree """
-    for root, dirs, files in os.walk(directory):
-        for basename in files:
-            if ".pyc" not in basename and "__pycache__" not in basename:
-                for pattern in patterns:
-                    if fnmatch.fnmatch(basename, pattern):
-                        filename = os.path.join(root, basename)
-                        yield filename
 
 
 package_data = {}
