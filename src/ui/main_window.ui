@@ -43,7 +43,7 @@
      <x>0</x>
      <y>0</y>
      <width>1475</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -419,7 +419,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>371</x>
-     <y>490</y>
+     <y>491</y>
     </hint>
    </hints>
   </connection>
@@ -512,5 +512,6 @@
   <slot>onConvertToLowercase()</slot>
   <slot>onOpenCommonMarkTutorial()</slot>
   <slot>onOpenCommonMarkReference()</slot>
+  <slot>onPasteHTMLFromClipBoard()</slot>
  </slots>
 </ui>
