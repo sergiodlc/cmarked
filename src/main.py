@@ -112,8 +112,8 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
 #        self.vPreviewScrollBar = self.ui.previewText.verticalScrollBar()
 
         # Set up the status bar:
-        self.status_template = self.tr('Chars: {0}, Ln: {1}')
-        self.statusLabel = QtWidgets.QLabel(self.status_template.format(0, 0))
+        self.status_template = self.tr('Chars: {0}, Words: {1}, Lines: {2}')
+        self.statusLabel = QtWidgets.QLabel(self.status_template.format(0, 0, 0))
         self.ui.statusbar.addPermanentWidget(self.statusLabel)
 
         self.connectSlots()
@@ -138,7 +138,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             self.vSourceScrollBar.actionTriggered.connect(self.onSourceScrollChanged)
         # self.previewPage.loadFinished.connect(self.onSourceScrollChanged)
         #self.request_scroll_adjust.connect(self.onSourceScrollChanged)
-        #self.ui.previewText.textChanged.connect(self.updateStatusBar)
+        self.previewPage.loadFinished.connect(self.updateStatusBar, QtCore.Qt.QueuedConnection)
         self.ast_ready.connect(self.applySyntaxHighlight)
         #self.ui.previewText.renderProcessTerminated.connect(self.previewPage.renderProcessTerminated)
 
@@ -435,8 +435,14 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             cursor.insertText(func(cursor.selectedText()))
 
     def updateStatusBar(self):
-        doc = self.ui.previewText.document()
-        self.statusLabel.setText(self.status_template.format(doc.characterCount(), doc.lineCount()))
+        def doUpdateStatusBar(text):
+            self.statusLabel.setText(self.status_template.format(
+                len(text),              # number of characters
+                len(text.split()),      # number of words
+                text.count('\n') + 1)   # number of lines
+            )
+
+        self.previewPage.toPlainText(doUpdateStatusBar)
 
     def open_help_about(self):
         self.help_about.exec_()
