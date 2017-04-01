@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class SyntaxHighlighter(QtGui.QSyntaxHighlighter):
 
-    WORDS = r'(?iu)[\w\']+'
+    WORDS = r"(?iu)[^\W\d_]+('[a-zA-Z])?"
 
     def __init__(self, parent=None, speller=None):
         super(SyntaxHighlighter, self).__init__(parent)
