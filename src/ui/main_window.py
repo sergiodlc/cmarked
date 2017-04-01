@@ -107,6 +107,10 @@ class Ui_MainWindow(object):
         self.actionCommonMark_Reference.setObjectName("actionCommonMark_Reference")
         self.actionRun = QtWidgets.QAction(MainWindow)
         self.actionRun.setObjectName("actionRun")
+        self.actionFind = QtWidgets.QAction(MainWindow)
+        self.actionFind.setObjectName("actionFind")
+        self.actionFind_and_Replace = QtWidgets.QAction(MainWindow)
+        self.actionFind_and_Replace.setObjectName("actionFind_and_Replace")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
@@ -123,6 +127,10 @@ class Ui_MainWindow(object):
         self.menu_Edit.addAction(self.actionCut)
         self.menu_Edit.addAction(self.actionCopy)
         self.menu_Edit.addAction(self.actionPaste)
+        self.menu_Edit.addSeparator()
+        self.menu_Edit.addAction(self.actionFind)
+        self.menu_Edit.addAction(self.actionFind_and_Replace)
+        self.menu_Edit.addSeparator()
         self.menu_Edit.addAction(self.actionConvert_to_Uppercase)
         self.menu_Edit.addAction(self.actionConvert_to_Lowercase)
         self.menuView.addAction(self.action_Live_Preview)
@@ -186,6 +194,8 @@ class Ui_MainWindow(object):
         self.actionCommonMark_Reference.setText(_translate("MainWindow", "CommonMark &Reference"))
         self.actionRun.setText(_translate("MainWindow", "Run"))
         self.actionRun.setShortcut(_translate("MainWindow", "Ctrl+R"))
+        self.actionFind.setText(_translate("MainWindow", "Find"))
+        self.actionFind_and_Replace.setText(_translate("MainWindow", "Find and Replace"))
 
 from PyQt5 import QtWebEngineWidgets
 from . import resources_rc

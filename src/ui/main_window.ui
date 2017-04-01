@@ -86,6 +86,10 @@
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionFind_and_Replace"/>
+    <addaction name="separator"/>
     <addaction name="actionConvert_to_Uppercase"/>
     <addaction name="actionConvert_to_Lowercase"/>
    </widget>
@@ -265,6 +269,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="text">
+    <string>Find</string>
+   </property>
+  </action>
+  <action name="actionFind_and_Replace">
+   <property name="text">
+    <string>Find and Replace</string>
    </property>
   </action>
  </widget>

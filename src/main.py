@@ -25,6 +25,7 @@ except ImportError:
 
 from cmark import markdown_to_html, highlightDocument, nearestSourcePos
 from highlighter import SyntaxHighlighter
+from findreplacedialog import FindDialog, FindReplaceDialog
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -185,6 +186,10 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         self.previewPage.loadFinished.connect(self.updateStatusBar, QtCore.Qt.QueuedConnection)
         self.ast_ready.connect(self.applySyntaxHighlight)
         #self.ui.previewText.renderProcessTerminated.connect(self.previewPage.renderProcessTerminated)
+        self.ui.actionFind.setShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Find))
+        self.ui.actionFind.triggered.connect(FindDialog(self.ui.sourceText).show)
+        self.ui.actionFind_and_Replace.setShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Replace))
+        self.ui.actionFind_and_Replace.triggered.connect(FindReplaceDialog(self.ui.sourceText).show)
 
     def onLivePreview(self):
         if self.ui.action_Live_Preview.isChecked():
