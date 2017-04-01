@@ -12,6 +12,7 @@ from ctypes import CDLL, c_char_p, c_long
 import subprocess
 import types
 import glob
+from functools import partial
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 
@@ -22,7 +23,8 @@ except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
 
-from cmark import CommonMarkHighlighter, markdown_to_html, highlightDocument, nearestSourcePos
+from cmark import markdown_to_html, highlightDocument, nearestSourcePos
+from highlighter import SyntaxHighlighter
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -56,15 +58,43 @@ def insertFromMimeData(self, source):
             file.write(html)
 
         commonMark = fromHTMLtoCommonMark(temp_file)
-        print(commonMark.decode("utf-8"))
         if commonMark:
             self.insertPlainText(commonMark.decode("utf-8"))
-            #cursor = self.textCursor()
-            #cursor.insertText(commonMark.decode("utf-8"))
         os.remove(temp_file)
     else:
         QtWidgets.QPlainTextEdit.insertFromMimeData(self, source)
 
+
+def contextMenuEvent(self, event, parent=None):
+    def correctWord(cursor, word):
+        # From QTextCursor doc:
+        # if there is a selection, the selection is deleted and replaced
+        return lambda: cursor.insertText(word)
+
+    popup_menu = self.createStandardContextMenu()
+    paste_action = popup_menu.actions()[6]
+    paste_formatted_action = QtWidgets.QAction(self.tr("Paste raw HTML"), popup_menu)
+    paste_formatted_action.triggered.connect(parent.insertFromRawHtml)
+    paste_formatted_action.setShortcut(QtGui.QKeySequence("Ctrl+Shift+V"))
+    popup_menu.insertAction(paste_action, paste_formatted_action)
+
+    # Spellcheck the word under the mouse cursor, not self.textCursor
+    cursor = self.cursorForPosition(event.pos())
+    cursor.select(QtGui.QTextCursor.WordUnderCursor)
+
+    text = cursor.selectedText()
+    if parent.speller and text:
+        if not parent.speller.check(text):
+            lastAction = popup_menu.actions()[0]
+            for word in parent.speller.suggest(text)[:10]:
+                action = QtWidgets.QAction(word, popup_menu)
+                action.triggered.connect(correctWord(cursor, word))
+                defaultFamily = QtWidgets.QApplication.font().family()
+                action.setFont(QtGui.QFont(defaultFamily, weight=QtGui.QFont.Bold))
+                popup_menu.insertAction(lastAction, action)
+            popup_menu.insertSeparator(lastAction)
+
+    popup_menu.exec_(event.globalPos())
 
 class CMarkEdMainWindow(QtWidgets.QMainWindow):
     template = '''<html><head><link rel="stylesheet" href="{}"></head><body>{}</body></html>'''
@@ -99,12 +129,26 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         if windowState:
             self.restoreState(windowState)
 
+        # Spell checker support
+        try:
+            import enchant
+            enchant.Dict()
+            self.speller = enchant.Dict()
+        except ImportError:
+            log.warning("Spell checking unavailable. Need to install pyenchant.")
+            self.speller = None
+        except enchant.errors.DictNotFoundError:
+            log.warning("Spell checking unavailable. Need to install dictionary (e.g. aspell-en).")
+            self.speller = None
+
+        self.syntaxHighlighter = SyntaxHighlighter(self.ui.sourceText.document(), self.speller)
+
         self.ui.previewText.setPage(self.previewPage)
 
         self.ui.sourceText.setCenterOnScroll(True)
         self.ui.sourceText.canInsertFromMimeData = types.MethodType(canInsertFromMimeData, self.ui.sourceText)
         self.ui.sourceText.insertFromMimeData = types.MethodType(insertFromMimeData, self.ui.sourceText)
-        self.highlighter = CommonMarkHighlighter(self.ui.sourceText)
+        self.ui.sourceText.contextMenuEvent = types.MethodType(partial(contextMenuEvent, parent=self), self.ui.sourceText)
 
         self.ui.action_Save.setDisabled(True)
 
@@ -190,16 +234,16 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
     #@QtCore.pyqtSlot(int)
     def onSourceScrollChanged(self):
         if self.vSourceScrollBar and self.ast:
-            print("pasa")
             block = self.ui.sourceText.firstVisibleBlock()
             if block:
                 ln = block.blockNumber()
                 sp = nearestSourcePos(self.ast, ln)
                 if sp:
-                    self.previewPage.runJavaScript('''document.querySelector('p[data-sourcepos="%s"]').scrollIntoView();''' % sp)
+                    self.previewPage.runJavaScript('''var el = document.querySelector('p[data-sourcepos="%s"]'); el && el.scrollIntoView();''' % sp)
 
     def onSourceCursorPositionChanged(self):
-        log.info("Cursor position changed")
+        pass
+        # log.info("Cursor position changed")
         # cl = self.ui.sourceText.textCursor().blockNumber()
         # smin, spos, smax = self.vSourceScrollBar.minimum(), self.vSourceScrollBar.value(), self.vSourceScrollBar.maximum()
         # try:
@@ -224,8 +268,9 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
             #self.onSourceScrollChanged()
 
     def applySyntaxHighlight(self):
-        doc = self.ui.sourceText.document()
-        highlightDocument(doc, self.ast)
+        pass
+        # doc = self.ui.sourceText.document()
+        # highlightDocument(doc, self.ast)
 #        block = doc.begin()
 #        node_seq = cmark.iterBlockNodes(self.ast)
 #        node, node_start, node_end = next(node_seq)
@@ -447,13 +492,24 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
     def open_help_about(self):
         self.help_about.exec_()
 
+    def insertFromRawHtml(self):
+        qclippy = QtWidgets.QApplication.clipboard()
+        if qclippy.mimeData().hasHtml():
+            self.ui.sourceText.insertFromMimeData(self.mimeFromText(qclippy.mimeData().html()))
+        else:
+            self.ui.sourceText.insertFromMimeData(qclippy.mimeData())
+
+    def mimeFromText(self, text):
+        mime = QtCore.QMimeData()
+        mime.setText(text)
+        return mime
+
+
     def onOpenCommonMarkTutorial(self):
         webbrowser.open_new_tab("http://commonmark.org/help/tutorial/")
 
     def onOpenCommonMarkReference(self):
-        p = self.previewPage.scrollPosition()
-        log.info("Scroll position: (%f, %f)", p.x(), p.y())
-        #webbrowser.open_new_tab("http://commonmark.org/help/")
+        webbrowser.open_new_tab("http://commonmark.org/help/")
 
 
 
