@@ -11,7 +11,10 @@ import platform
 
 from PyQt5 import QtCore, QtGui
 
-from styles import editorStyles
+try:
+    from styles import editorStyles
+except ImportError:
+    from cmarked.styles import editorStyles
 
 default_style = editorStyles['default']
 

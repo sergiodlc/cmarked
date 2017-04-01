@@ -19,13 +19,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets, QtWebEngineWidgets
 try:
     from ui.main_window import Ui_MainWindow
     from ui.about_cmarked import Ui_Dialog as Ui_Help_About
+    from cmark import markdown_to_html, highlightDocument, nearestSourcePos
+    from highlighter import SyntaxHighlighter
+    from findreplacedialog import FindDialog, FindReplaceDialog
 except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
-
-from cmark import markdown_to_html, highlightDocument, nearestSourcePos
-from highlighter import SyntaxHighlighter
-from findreplacedialog import FindDialog, FindReplaceDialog
+    from cmarked.cmark import markdown_to_html, highlightDocument, nearestSourcePos
+    from cmarked.highlighter import SyntaxHighlighter
+    from cmarked.findreplacedialog import FindDialog, FindReplaceDialog
 
 
 logging.basicConfig(level=logging.DEBUG)
