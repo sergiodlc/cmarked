@@ -57,7 +57,7 @@ def insertFromMimeData(self, source):
         html = source.html()
 
         temp_file = "temp.html"
-        with open(temp_file, 'w') as file:
+        with open(temp_file, encoding='utf-8', mode='w') as file:
             file.write(html)
 
         commonMark = fromHTMLtoCommonMark(temp_file)
