@@ -45,9 +45,9 @@ Source: "{#MyAppSrc}\src\dist\cmarked\*"; DestDir: "{app}\"; Flags: ignoreversio
 Source: "{#MyAppSrc}\src\ui\img\cmarked.ico"; DestDir: "{app}\"; Flags: ignoreversion recursesubdirs
 Source: "{#MyAppSrc}\src\ui\img\markdown-32x32-orange.png"; DestDir: "{app}\"; Flags: ignoreversion recursesubdirs
 Source: "{#MyAppSrc}\LICENSE.txt"; DestDir: "{app}\"; Flags: ignoreversion recursesubdirs
-#Source: "{#MyAppSrc}\ci\appveyor\after_install.cmd"; DestDir: "{app}\"; Flags: ignoreversion
+;Source: "{#MyAppSrc}\ci\appveyor\after_install.cmd"; DestDir: "{app}\"; Flags: ignoreversion
 Source: "{#MyAppSrc}\vcredist_x86.exe"; DestDir: "{tmp}\"; Flags: ignoreversion deleteafterinstall
-#Source: "{#MyAppSrc}\ci\appveyor\vcredist_x64.exe"; DestDir: "{tmp}\"; Flags: ignoreversion deleteafterinstall
+;Source: "{#MyAppSrc}\ci\appveyor\vcredist_x64.exe"; DestDir: "{tmp}\"; Flags: ignoreversion deleteafterinstall
 
 [Icons]
 Name: "{group}\{#MyAppName}"; IconFilename: "{app}\cmarked.ico"; Filename: "{app}\{#MyAppExeName}"
@@ -59,10 +59,10 @@ Name: "{commondesktop}\{#MyAppName}"; IconFilename: "{app}\cmarked.ico"; Filenam
 
 [Run]
 Filename: "{tmp}\vcredist_x86.exe"; StatusMsg: "{#VCmsg}"; Check: not VCinstalled
-#Filename: "{tmp}\vcredist_x86.exe"; StatusMsg: "{#VCmsg}"; Check: not IsWin64 and not VCinstalled
-#Filename: "{tmp}\vcredist_x64.exe"; StatusMsg: "{#VCmsg}"; Check: IsWin64 and not VCinstalled
+;Filename: "{tmp}\vcredist_x86.exe"; StatusMsg: "{#VCmsg}"; Check: not IsWin64 and not VCinstalled
+;Filename: "{tmp}\vcredist_x64.exe"; StatusMsg: "{#VCmsg}"; Check: IsWin64 and not VCinstalled
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-#Filename: "{app}\after_install.cmd"; Description: "Delete ALL existing data"; Flags: postinstall nowait skipifsilent unchecked
+;Filename: "{app}\after_install.cmd"; Description: "Delete ALL existing data"; Flags: postinstall nowait skipifsilent unchecked
 
 [Code]
 function VCinstalled: Boolean;
