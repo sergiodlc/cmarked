@@ -4,7 +4,9 @@ block_cipher = None
 
 added_files = [
 	('../styles', 'styles'),
-	('C:\\develop\\cmark\\build\\src\\Release\\cmark.dll', '.'),
+#	('C:\\develop\\cmark\\build\\src\\Release\\cmark.dll', '.'),
+#	('C:\\Program Files (x86)\\Pandoc\\pandoc.exe', '.'),
+	('C:\\projects\\cmark\\build\\windows\\bin\\cmark.dll', '.'),
 	('C:\\Program Files (x86)\\Pandoc\\pandoc.exe', '.'),
 ]
 
@@ -14,7 +16,8 @@ added_binaries = [
 ]
 
 a = Analysis(['launch.py'],
-             pathex=['C:\\Users\\Sergio\\AppData\\Local\\Programs\\Python\\Python35-32\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\develop\\cmarked\\src'],
+#             pathex=['C:\\Users\\Sergio\\AppData\\Local\\Programs\\Python\\Python35-32\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\develop\\cmarked\\src'],
+             pathex=['C:\\Python36\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\projects\\cmarked\\src'],
              binaries = added_binaries,
              datas = added_files,
              hiddenimports=[],
