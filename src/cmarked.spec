@@ -1,4 +1,11 @@
 # -*- mode: python -*-
+import platform
+import os
+
+# Find PyQt5 directory
+from inspect import getfile
+import PyQt5
+pyqt_dir = os.path.dirname(getfile(PyQt5))
 
 block_cipher = None
 
@@ -17,7 +24,8 @@ added_binaries = [
 
 a = Analysis(['launch.py'],
 #             pathex=['C:\\Users\\Sergio\\AppData\\Local\\Programs\\Python\\Python35-32\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\develop\\cmarked\\src'],
-             pathex=['C:\\Python36\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\projects\\cmarked\\src'],
+#             pathex=['C:\\Python36\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\projects\\cmarked\\src'],
+             pathex=['C:\\projects\\cmarked\\src', pyqt_dir],
              binaries = added_binaries,
              datas = added_files,
              hiddenimports=[],
@@ -29,15 +37,28 @@ a = Analysis(['launch.py'],
              cipher=block_cipher)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
-exe = EXE(pyz,
-          a.scripts,
-          exclude_binaries=True,
-          name='cmarked',
-          debug=False,  # True
-          strip=False,
-          upx=True,
-          console=False  # True
-)
+
+if platform.system() == 'Windows':
+    exe = EXE(pyz,
+              a.scripts,
+              exclude_binaries=True,
+              name='cmarked',
+              debug=False,  # True
+              strip=False,
+              upx=True,
+              console=False,  # True
+              icon = 'cmarked.ico'
+    )
+else:
+    exe = EXE(pyz,
+              a.scripts,
+              exclude_binaries=True,
+              name='cmarked',
+              debug=False,  # True
+              strip=False,
+              upx=True,
+              console=False  # True
+    )
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
