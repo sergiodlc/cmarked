@@ -100,7 +100,7 @@ def contextMenuEvent(self, event, parent=None):
     popup_menu.exec_(event.globalPos())
 
 class CMarkEdMainWindow(QtWidgets.QMainWindow):
-    template = '''<html><head><link rel="stylesheet" href="{}"></head><body>{}</body></html>'''
+    template = '''<html><head><link rel="stylesheet" href="file://{}"></head><body>{}</body></html>'''
     ast_ready = QtCore.pyqtSignal()
     #request_scroll_adjust = QtCore.pyqtSignal()
 
@@ -224,14 +224,15 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
     def onExportAsPDF(self):
         try:
             import weasyprint
-            from weasyprint import HTML
+            from weasyprint import HTML, CSS
             logger = weasyprint.LOGGER.warning = lambda *a, **kw: None
 
             fileName, filtr = QtWidgets.QFileDialog.getSaveFileName(self,
                 self.tr("Export to PDF"), "", self.tr("PDF files (*.pdf)"))
             if fileName:
                 QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                HTML(md2html(self.ui.sourceText.toPlainText())).write_pdf(fileName)
+                rendered, _ = markdown_to_html(self.ui.sourceText.toPlainText(), 0)
+                HTML(string=self.template.format(self.style, rendered)).write_pdf(fileName, stylesheets=[CSS(filename=self.style)])
                 QtWidgets.QApplication.restoreOverrideCursor()
         except ImportError:
             message = "You need to install 'weasyprint' in order to use this functionality."
@@ -410,7 +411,8 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
                             self.tr("Cannot open file: {}.").format(fileName))
                 else:
                     QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-                    f.write(md2html(self.ui.sourceText.toPlainText()))
+                    rendered, _ = markdown_to_html(self.ui.sourceText.toPlainText(), 0)
+                    f.write(self.template.format(self.style, rendered))
                     QtWidgets.QApplication.restoreOverrideCursor()
 
     def onStyleChanged(self):

@@ -197,11 +197,11 @@ def md2html(textbytes, textlen, opts):
     return html, ast
 
 
-def markdown_to_html(text):
+def markdown_to_html(text, opts=2):  # opts=2 => Add sourcepos
     if sys.version_info >= (3,0):
         textbytes = text.encode('utf-8')
         textlen = len(textbytes)
-        res, ast = md2html(textbytes, textlen, 2)  # 2 => Add sourcepos
+        res, ast = md2html(textbytes, textlen, opts)
         return res.decode('utf-8'), ast
     else:
         textbytes = text
