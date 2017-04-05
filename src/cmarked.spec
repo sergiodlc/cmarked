@@ -7,6 +7,8 @@ from inspect import getfile
 import PyQt5
 pyqt_dir = os.path.dirname(getfile(PyQt5))
 
+print('PyQt5 Dir:', pyqt_dir)
+
 block_cipher = None
 
 added_files = [
@@ -47,7 +49,7 @@ if platform.system() == 'Windows':
               strip=False,
               upx=True,
               console=False,  # True
-              icon = 'cmarked.ico'
+              icon = 'ui\\img\\cmarked.ico'
     )
 else:
     exe = EXE(pyz,
