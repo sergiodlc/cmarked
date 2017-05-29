@@ -45,9 +45,9 @@ if platform.system() == 'Windows':
               a.scripts,
               exclude_binaries=True,
               name='cmarked',
-              debug=False,  # True
+              debug=True,  # True
               strip=False,
-              upx=True,
+              upx=False,
               console=False,  # True
               icon = 'ui\\img\\cmarked.ico'
     )
