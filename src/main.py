@@ -8,7 +8,6 @@ import os
 import logging
 import webbrowser
 from contextlib import contextmanager
-from ctypes import CDLL, c_char_p, c_long
 import subprocess
 import types
 import glob
@@ -22,12 +21,14 @@ try:
     from cmark import markdown_to_html, highlightDocument, nearestSourcePos
     from highlighter import SyntaxHighlighter
     from findreplacedialog import FindDialog, FindReplaceDialog
+    from preferencesdialog import PreferencesDialog
 except ImportError:
     from cmarked.ui.main_window import Ui_MainWindow
     from cmarked.ui.about_cmarked import Ui_Dialog as Ui_Help_About
     from cmarked.cmark import markdown_to_html, highlightDocument, nearestSourcePos
     from cmarked.highlighter import SyntaxHighlighter
     from cmarked.findreplacedialog import FindDialog, FindReplaceDialog
+    from cmarked.preferencesdialog import PreferencesDialog
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -192,6 +193,7 @@ class CMarkEdMainWindow(QtWidgets.QMainWindow):
         self.ui.actionFind.triggered.connect(FindDialog(self.ui.sourceText).show)
         self.ui.actionFind_and_Replace.setShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Replace))
         self.ui.actionFind_and_Replace.triggered.connect(FindReplaceDialog(self.ui.sourceText).show)
+        self.ui.actionPreferences.triggered.connect(PreferencesDialog(self).show)
 
     def onLivePreview(self):
         if self.ui.action_Live_Preview.isChecked():

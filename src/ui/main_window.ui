@@ -92,6 +92,8 @@
     <addaction name="separator"/>
     <addaction name="actionConvert_to_Uppercase"/>
     <addaction name="actionConvert_to_Lowercase"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -279,6 +281,11 @@
   <action name="actionFind_and_Replace">
    <property name="text">
     <string>Find and Replace</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences...</string>
    </property>
   </action>
  </widget>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/ui/main_window.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -111,6 +111,8 @@ class Ui_MainWindow(object):
         self.actionFind.setObjectName("actionFind")
         self.actionFind_and_Replace = QtWidgets.QAction(MainWindow)
         self.actionFind_and_Replace.setObjectName("actionFind_and_Replace")
+        self.actionPreferences = QtWidgets.QAction(MainWindow)
+        self.actionPreferences.setObjectName("actionPreferences")
         self.menu_File.addAction(self.action_Open)
         self.menu_File.addAction(self.action_Save)
         self.menu_File.addAction(self.action_Save_As)
@@ -133,6 +135,8 @@ class Ui_MainWindow(object):
         self.menu_Edit.addSeparator()
         self.menu_Edit.addAction(self.actionConvert_to_Uppercase)
         self.menu_Edit.addAction(self.actionConvert_to_Lowercase)
+        self.menu_Edit.addSeparator()
+        self.menu_Edit.addAction(self.actionPreferences)
         self.menuView.addAction(self.action_Live_Preview)
         self.menuView.addAction(self.action_Vertical_Layout)
         self.menuView.addAction(self.action_Swap_Views)
@@ -196,6 +200,7 @@ class Ui_MainWindow(object):
         self.actionRun.setShortcut(_translate("MainWindow", "Ctrl+R"))
         self.actionFind.setText(_translate("MainWindow", "Find"))
         self.actionFind_and_Replace.setText(_translate("MainWindow", "Find and Replace"))
+        self.actionPreferences.setText(_translate("MainWindow", "Preferences..."))
 
 from PyQt5 import QtWebEngineWidgets
 from . import resources_rc
